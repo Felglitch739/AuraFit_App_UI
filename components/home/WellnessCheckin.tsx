@@ -1,15 +1,11 @@
-/**
- * WellnessCheckin — Quick daily check-in (energía, sueño, estrés, ánimo).
- * Muestra el estado actual o un CTA para completar el check-in.
- */
-
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { PressableCard, TitleSmall, BodySmall, LabelMedium, Caption } from '@/components/ui';
-import { colors, spacing, radius } from '@/constants/theme';
+import { View, StyleSheet, Text } from 'react-native';
+import { GlassCard, TitleSmall, BodySmall, LabelMedium, Caption } from '@/components/ui';
+import { spacing } from '@/constants/theme';
 import type { WellnessCheckin as WellnessCheckinType, MoodType } from '@/types';
 import type { WellnessData } from '@/store/useUserStore';
-import { Lightning, Moon, Brain, Smiley, SmileyMeh, SmileySad, Star, WarningCircle } from 'phosphor-react-native';
+import { Lightning, Moon, Brain, Smiley, SmileyMeh, SmileySad, Star, WarningCircle, CaretRight, Camera } from 'phosphor-react-native';
+import { useTheme } from '@/hooks/useTheme';
 
 interface WellnessCheckinProps {
   checkin?: WellnessCheckinType | WellnessData;
@@ -17,61 +13,94 @@ interface WellnessCheckinProps {
 }
 
 export function WellnessCheckin({ checkin, onPress }: WellnessCheckinProps) {
+  const { colors, isDark } = useTheme();
+
   if (!checkin) {
     return (
-      <PressableCard variant="default" onPress={onPress}>
-        <TitleSmall style={{ fontWeight: '700', color: '#FFFFFF' }}>Check-in de bienestar</TitleSmall>
-        <BodySmall color={colors.muted} style={styles.cta}>
-          Toca para registrar cómo te sentís hoy
+      <GlassCard level="medium" onPress={onPress} style={styles.cardContainer}>
+        <View style={styles.headerRow}>
+          <TitleSmall style={{ fontWeight: '700', color: colors.foreground }}>Check-in de bienestar</TitleSmall>
+          <CaretRight size={18} color={colors.muted} />
+        </View>
+        <BodySmall style={{ marginTop: spacing.xs, color: colors.muted }}>
+          Toca para registrar tu estado de hoy
         </BodySmall>
-      </PressableCard>
+      </GlassCard>
     );
   }
 
   return (
-    <PressableCard variant="default" onPress={onPress}>
-      <TitleSmall style={styles.title}>Bienestar hoy</TitleSmall>
-      <View style={styles.metricsRow}>
+    <GlassCard level="medium" onPress={onPress} style={styles.cardContainer}>
+      <View style={styles.headerRow}>
+        <Text style={[styles.sectionHeader, { color: colors.muted }]}>RESUMEN DE BIENESTAR</Text>
+        <CaretRight size={16} color={colors.muted} />
+      </View>
+
+      <View style={styles.metricsGrid}>
         <WellnessMetric
-          icon={<Lightning size={22} color={'#FF9F0A'} weight="fill" />}
+          icon={<Lightning size={18} color={colors.orange} weight="fill" />}
           label="Energía"
           value={`${checkin.energy}/5`}
+          badgeBg={isDark ? 'rgba(255, 159, 10, 0.14)' : 'rgba(255, 149, 0, 0.10)'}
+          badgeBorder={isDark ? 'rgba(255, 159, 10, 0.28)' : 'rgba(255, 149, 0, 0.20)'}
         />
         <WellnessMetric
-          icon={<Moon size={22} color={'#5E5CE6'} weight="fill" />}
+          icon={<Moon size={18} color={colors.purple} weight="fill" />}
           label="Sueño"
           value={`${checkin.sleepHours}h`}
+          badgeBg={isDark ? 'rgba(94, 92, 230, 0.14)' : 'rgba(88, 86, 214, 0.10)'}
+          badgeBorder={isDark ? 'rgba(94, 92, 230, 0.28)' : 'rgba(88, 86, 214, 0.20)'}
         />
         <WellnessMetric
-          icon={<Brain size={22} color={'#0A84FF'} weight="fill" />}
+          icon={<Brain size={18} color={colors.primary} weight="fill" />}
           label="Estrés"
           value={`${checkin.stress}/5`}
+          badgeBg={isDark ? 'rgba(10, 132, 255, 0.14)' : 'rgba(0, 122, 255, 0.10)'}
+          badgeBorder={isDark ? 'rgba(10, 132, 255, 0.28)' : 'rgba(0, 122, 255, 0.20)'}
         />
         <WellnessMetric
-          icon={getMoodIcon(checkin.mood)}
+          icon={getMoodIcon(checkin.mood, colors)}
           label="Ánimo"
-          value=""
-          isIconOnly
+          value={getMoodLabel(checkin.mood)}
+          badgeBg={isDark ? 'rgba(48, 209, 88, 0.14)' : 'rgba(52, 199, 89, 0.10)'}
+          badgeBorder={isDark ? 'rgba(48, 209, 88, 0.28)' : 'rgba(52, 199, 89, 0.20)'}
         />
       </View>
-    </PressableCard>
+    </GlassCard>
   );
 }
 
-function getMoodIcon(mood: MoodType) {
+function getMoodIcon(mood: MoodType, colors: any) {
   switch (mood) {
     case 'excellent':
-      return <Star size={22} color="#FFD60A" weight="fill" />;
+      return <Star size={18} color={colors.accent} weight="fill" />;
     case 'good':
-      return <Smiley size={22} color="#30D158" weight="fill" />;
+      return <Smiley size={18} color={colors.success} weight="fill" />;
     case 'neutral':
-      return <SmileyMeh size={22} color="#8E8E93" weight="fill" />;
+      return <SmileyMeh size={18} color={colors.muted} weight="fill" />;
     case 'sad':
-      return <SmileySad size={22} color="#FF9F0A" weight="fill" />;
+      return <SmileySad size={18} color={colors.warning} weight="fill" />;
     case 'stressed':
-      return <WarningCircle size={22} color="#FF453A" weight="fill" />;
+      return <WarningCircle size={18} color={colors.destructive} weight="fill" />;
     default:
-      return <Smiley size={22} color="#8E8E93" weight="fill" />;
+      return <Smiley size={18} color={colors.muted} weight="fill" />;
+  }
+}
+
+function getMoodLabel(mood: MoodType) {
+  switch (mood) {
+    case 'excellent':
+      return 'Excelente';
+    case 'good':
+      return 'Bueno';
+    case 'neutral':
+      return 'Normal';
+    case 'sad':
+      return 'Bajo';
+    case 'stressed':
+      return 'Alto';
+    default:
+      return 'OK';
   }
 }
 
@@ -79,53 +108,90 @@ function WellnessMetric({
   icon,
   label,
   value,
-  isIconOnly = false,
+  badgeBg,
+  badgeBorder,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
-  isIconOnly?: boolean;
+  badgeBg: string;
+  badgeBorder: string;
 }) {
+  const { colors, isDark } = useTheme();
+
   return (
-    <View style={styles.metric}>
-      <View style={styles.metricIcon}>
+    <View
+      style={[
+        styles.metricItem,
+        {
+          backgroundColor: isDark ? 'rgba(255, 255, 255, 0.03)' : '#F9F9FB',
+          borderColor: colors.borderLight,
+        },
+      ]}
+    >
+      <View style={[styles.iconBadge, { backgroundColor: badgeBg, borderColor: badgeBorder }]}>
         {icon}
       </View>
-      <Caption color={colors.muted}>{label}</Caption>
-      {!isIconOnly && <LabelMedium style={styles.metricValue}>{value}</LabelMedium>}
+      <Caption style={[styles.labelCaption, { color: colors.muted }]} numberOfLines={1}>
+        {label}
+      </Caption>
+      <LabelMedium style={[styles.metricValueText, { color: colors.foreground }]} numberOfLines={1}>
+        {value}
+      </LabelMedium>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  title: {
-    marginBottom: spacing.md,
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
+  cardContainer: {
+    padding: spacing.md,
   },
-  cta: {
-    marginTop: spacing.xs,
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.sm + 2,
   },
-  metricsRow: {
+  sectionHeader: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+  },
+  metricsGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: 6,
+    marginTop: 2,
   },
-  metric: {
-    alignItems: 'center',
-    gap: 4,
-  },
-  metricIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#1C1C24',
+  metricItem: {
+    flex: 1,
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 4,
+    borderRadius: 14,
+    borderWidth: 1,
   },
-  metricValue: {
-    color: '#FFFFFF',
-    fontWeight: '700',
+  iconBadge: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    marginBottom: 6,
+  },
+  labelCaption: {
+    fontSize: 11,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  metricValueText: {
     fontSize: 13,
+    fontWeight: '800',
+    textAlign: 'center',
+    marginTop: 2,
   },
 });

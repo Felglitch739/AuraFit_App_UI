@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { ScrollView, View, StyleSheet, Switch } from 'react-native';
+import { ScrollView, View, StyleSheet, Switch, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Card, TitleSmall, Button, LabelMedium, BodySmall, Caption } from '@/components/ui';
-import { colors, spacing } from '@/constants/theme';
+import { MeshBackground, GlassCard, TitleSmall, Button, LabelMedium, BodySmall, Caption } from '@/components/ui';
+import { spacing } from '@/constants/theme';
 import { CaretLeft } from 'phosphor-react-native';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function NotificationsScreen() {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
 
   const [workoutReminders, setWorkoutReminders] = useState(true);
   const [dailyCheckin, setDailyCheckin] = useState(true);
@@ -15,89 +17,89 @@ export default function NotificationsScreen() {
   const [soundEffects, setSoundEffects] = useState(false);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <View style={styles.header}>
-        <Button
-          title=""
-          variant="outline"
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <CaretLeft size={22} color={colors.text} />
-        </Button>
-        <TitleSmall style={styles.headerTitle}>Notificaciones</TitleSmall>
-        <View style={{ width: 44 }} />
-      </View>
+    <MeshBackground>
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <View style={styles.header}>
+          <Pressable
+            onPress={() => router.back()}
+            style={[styles.backButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#E5E5EA' }]}
+            accessibilityLabel="Volver"
+          >
+            <CaretLeft size={20} color={colors.foreground} />
+          </Pressable>
+          <TitleSmall style={[styles.headerTitle, { color: colors.foreground }]}>Notificaciones</TitleSmall>
+          <View style={{ width: 40 }} />
+        </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Caption style={styles.sectionHeading}>RECORDATORIOS DIARIOS</Caption>
-        <Card style={styles.card} padding={0}>
-          <View style={styles.toggleRow}>
-            <View style={styles.toggleText}>
-              <LabelMedium style={styles.toggleTitle}>Recordatorios de entrenamiento</LabelMedium>
-              <BodySmall color={colors.muted}>Avisos 15 min antes de tu rutina programada</BodySmall>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <Caption style={[styles.sectionHeading, { color: colors.muted }]}>RECORDATORIOS DIARIOS</Caption>
+          <GlassCard level="hero" style={styles.card} padding={0}>
+            <View style={styles.toggleRow}>
+              <View style={styles.toggleText}>
+                <LabelMedium style={[styles.toggleTitle, { color: colors.foreground }]}>Recordatorios de entrenamiento</LabelMedium>
+                <BodySmall style={{ color: colors.muted }}>Avisos 15 min antes de tu rutina programada</BodySmall>
+              </View>
+              <Switch
+                value={workoutReminders}
+                onValueChange={setWorkoutReminders}
+                trackColor={{ false: '#767577', true: colors.primary }}
+              />
             </View>
-            <Switch
-              value={workoutReminders}
-              onValueChange={setWorkoutReminders}
-              trackColor={{ false: '#767577', true: colors.primary }}
-            />
-          </View>
 
-          <View style={styles.divider} />
+            <View style={[styles.divider, { backgroundColor: colors.borderLight }]} />
 
-          <View style={styles.toggleRow}>
-            <View style={styles.toggleText}>
-              <LabelMedium style={styles.toggleTitle}>Check-in diario de bienestar</LabelMedium>
-              <BodySmall color={colors.muted}>Aviso por la noche para registrar ánimo y energía</BodySmall>
+            <View style={styles.toggleRow}>
+              <View style={styles.toggleText}>
+                <LabelMedium style={[styles.toggleTitle, { color: colors.foreground }]}>Check-in diario de bienestar</LabelMedium>
+                <BodySmall style={{ color: colors.muted }}>Aviso por la noche para registrar ánimo y energía</BodySmall>
+              </View>
+              <Switch
+                value={dailyCheckin}
+                onValueChange={setDailyCheckin}
+                trackColor={{ false: '#767577', true: colors.primary }}
+              />
             </View>
-            <Switch
-              value={dailyCheckin}
-              onValueChange={setDailyCheckin}
-              trackColor={{ false: '#767577', true: colors.primary }}
-            />
-          </View>
-        </Card>
+          </GlassCard>
 
-        <Caption style={styles.sectionHeading}>RESÚMENES Y SONIDO</Caption>
-        <Card style={styles.card} padding={0}>
-          <View style={styles.toggleRow}>
-            <View style={styles.toggleText}>
-              <LabelMedium style={styles.toggleTitle}>Resumen semanal de progreso</LabelMedium>
-              <BodySmall color={colors.muted}>Informe los domingos con métricas clave</BodySmall>
+          <Caption style={[styles.sectionHeading, { color: colors.muted }]}>RESÚMENES Y SONIDO</Caption>
+          <GlassCard level="hero" style={styles.card} padding={0}>
+            <View style={styles.toggleRow}>
+              <View style={styles.toggleText}>
+                <LabelMedium style={[styles.toggleTitle, { color: colors.foreground }]}>Resumen semanal de progreso</LabelMedium>
+                <BodySmall style={{ color: colors.muted }}>Informe los domingos con métricas clave</BodySmall>
+              </View>
+              <Switch
+                value={weeklyReport}
+                onValueChange={setWeeklyReport}
+                trackColor={{ false: '#767577', true: colors.primary }}
+              />
             </View>
-            <Switch
-              value={weeklyReport}
-              onValueChange={setWeeklyReport}
-              trackColor={{ false: '#767577', true: colors.primary }}
-            />
-          </View>
 
-          <View style={styles.divider} />
+            <View style={[styles.divider, { backgroundColor: colors.borderLight }]} />
 
-          <View style={styles.toggleRow}>
-            <View style={styles.toggleText}>
-              <LabelMedium style={styles.toggleTitle}>Efectos de sonido</LabelMedium>
-              <BodySmall color={colors.muted}>Sonidos al completar series y ejercicios</BodySmall>
+            <View style={styles.toggleRow}>
+              <View style={styles.toggleText}>
+                <LabelMedium style={[styles.toggleTitle, { color: colors.foreground }]}>Efectos de sonido</LabelMedium>
+                <BodySmall style={{ color: colors.muted }}>Sonidos al completar series y ejercicios</BodySmall>
+              </View>
+              <Switch
+                value={soundEffects}
+                onValueChange={setSoundEffects}
+                trackColor={{ false: '#767577', true: colors.primary }}
+              />
             </View>
-            <Switch
-              value={soundEffects}
-              onValueChange={setSoundEffects}
-              trackColor={{ false: '#767577', true: colors.primary }}
-            />
-          </View>
-        </Card>
+          </GlassCard>
 
-        <Button title="Guardar preferencias" onPress={() => router.back()} variant="primary" style={styles.saveButton} />
-      </ScrollView>
-    </SafeAreaView>
+          <Button title="Guardar preferencias" onPress={() => router.back()} variant="primary" style={styles.saveButton} />
+        </ScrollView>
+      </SafeAreaView>
+    </MeshBackground>
   );
 }
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
   },
   header: {
     flexDirection: 'row',
@@ -110,7 +112,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    paddingHorizontal: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -124,13 +125,11 @@ const styles = StyleSheet.create({
   sectionHeading: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#8E8E93',
     marginBottom: spacing.xs,
     marginLeft: 4,
+    textTransform: 'uppercase',
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
     marginBottom: spacing.lg,
     overflow: 'hidden',
   },
@@ -150,7 +149,6 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: 'rgba(0,0,0,0.06)',
   },
   saveButton: {
     marginTop: spacing.sm,

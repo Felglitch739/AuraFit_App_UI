@@ -1,12 +1,8 @@
-/**
- * CalorieSummary — Anillo de calorías principal + mini-anillos de macros.
- * El elemento visual central del Dashboard (estilo Apple Fitness).
- */
-
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Card, ProgressRing, TitleSmall, DisplayMedium, BodySmall, Caption, LabelMedium } from '@/components/ui';
-import { colors, spacing } from '@/constants/theme';
+import { View, StyleSheet, Text } from 'react-native';
+import { GlassCard, ProgressRing, DisplayMedium, Caption, LabelMedium } from '@/components/ui';
+import { spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/useTheme';
 
 interface CalorieSummaryProps {
   consumed: number;
@@ -23,108 +19,149 @@ export function CalorieSummary({
   carbs,
   fats,
 }: CalorieSummaryProps) {
+  const { colors, isDark } = useTheme();
   const calorieProgress = Math.min(consumed / target, 1);
   const remaining = Math.max(target - consumed, 0);
 
   return (
-    <Card variant="default">
-      <TitleSmall style={styles.title}>Calorías de hoy</TitleSmall>
+    <GlassCard level="hero" style={styles.container}>
+      <Text style={[styles.sectionHeader, { color: colors.muted }]}>NUTRICIÓN DE HOY</Text>
 
       <View style={styles.mainRow}>
-        {/* Anillo principal de calorías con gradiente Electric Dark */}
-        <ProgressRing
-          progress={calorieProgress}
-          size={140}
-          strokeWidth={14}
-          gradientColors={['#0A84FF', '#5E5CE6']}
-        >
-          <DisplayMedium style={styles.calorieNumber}>
-            {consumed.toLocaleString()}
-          </DisplayMedium>
-          <Caption style={styles.targetCaption}>de {target.toLocaleString()} kcal</Caption>
-        </ProgressRing>
+        {/* Anillo de Calorías */}
+        <View style={styles.ringContainer}>
+          <ProgressRing
+            progress={calorieProgress}
+            size={146}
+            strokeWidth={14}
+            gradientColors={isDark ? ['#0A84FF', '#5E5CE6'] : ['#007AFF', '#5AC8FA']}
+          >
+            <DisplayMedium style={[styles.calorieNumber, { color: colors.foreground }]}>
+              {consumed.toLocaleString()}
+            </DisplayMedium>
+            <Caption style={[styles.targetCaption, { color: colors.muted }]}>/ {target.toLocaleString()} kcal</Caption>
+          </ProgressRing>
+        </View>
 
-        {/* Mini-anillos de macros */}
+        {/* Mini-anillos/desglose de macros */}
         <View style={styles.macrosColumn}>
-          <MacroRing
+          <MacroBar
             label="Proteína"
             current={protein.current}
             target={protein.target}
-            gradientColors={['#FF375F', '#FF453A']}
+            color={colors.protein}
             unit="g"
           />
-          <MacroRing
-            label="Carbos"
+          <MacroBar
+            label="Carbohidratos"
             current={carbs.current}
             target={carbs.target}
-            gradientColors={['#FFD60A', '#FF9F0A']}
+            color={colors.carbs}
             unit="g"
           />
-          <MacroRing
+          <MacroBar
             label="Grasas"
             current={fats.current}
             target={fats.target}
-            gradientColors={['#30D158', '#64D2FF']}
+            color={colors.fats}
             unit="g"
           />
         </View>
       </View>
 
-      <View style={styles.remainingRow}>
-        <BodySmall color={colors.muted}>
-          Faltan <BodySmall style={styles.boldRemaining}>{remaining.toLocaleString()}</BodySmall> kcal
-        </BodySmall>
+      <View style={[styles.footerRow, { borderTopColor: colors.borderLight }]}>
+        <View
+          style={[
+            styles.remainingPill,
+            {
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.03)' : '#F2F2F7',
+              borderColor: colors.borderLight,
+            },
+          ]}
+        >
+          <Text style={[styles.remainingText, { color: colors.muted }]}>
+            Restantes: <Text style={[styles.remainingValue, { color: colors.primary }]}>{remaining.toLocaleString()} kcal</Text>
+          </Text>
+        </View>
       </View>
-    </Card>
+    </GlassCard>
   );
 }
 
-function MacroRing({
+function MacroBar({
   label,
   current,
   target,
-  gradientColors,
+  color,
   unit,
 }: {
   label: string;
   current: number;
   target: number;
-  gradientColors: [string, string];
+  color: string;
   unit: string;
 }) {
-  const progress = Math.min(current / target, 1);
+  const { colors, isDark } = useTheme();
+  const ratio = Math.min(current / target, 1);
 
   return (
     <View style={styles.macroItem}>
-      <ProgressRing
-        progress={progress}
-        size={46}
-        strokeWidth={5}
-        gradientColors={gradientColors}
-      >
-        <Caption style={{ fontSize: 9, fontWeight: '800', color: '#FFFFFF' }}>{Math.round(current)}</Caption>
-      </ProgressRing>
-      <View style={styles.macroTextColumn}>
-        <Caption color={colors.muted}>{label}</Caption>
-        <LabelMedium style={styles.macroValue}>
-          {Math.round(current)}/{target}{unit}
+      <View style={styles.macroHeader}>
+        <View style={styles.macroTitleRow}>
+          <View style={[styles.macroDot, { backgroundColor: color }]} />
+          <Caption style={[styles.macroLabel, { color: colors.muted }]}>{label}</Caption>
+        </View>
+        <LabelMedium style={[styles.macroValue, { color: colors.foreground }]}>
+          {Math.round(current)}<Text style={[styles.macroTarget, { color: colors.muted }]}>/{target}{unit}</Text>
         </LabelMedium>
+      </View>
+
+      {/* Progress Bar Container */}
+      <View style={[styles.track, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#E5E5EA' }]}>
+        <View
+          style={[
+            styles.fill,
+            {
+              width: `${Math.round(ratio * 100)}%`,
+              backgroundColor: color,
+            },
+          ]}
+        />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  title: {
+  container: {
+    padding: spacing.md,
+  },
+  sectionHeader: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1.2,
     marginBottom: spacing.md,
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
+    textTransform: 'uppercase',
   },
   mainRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  ringContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  calorieNumber: {
+    fontSize: 32,
+    fontWeight: '800',
+    letterSpacing: -1,
+    lineHeight: 36,
+  },
+  targetCaption: {
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 2,
   },
   macrosColumn: {
     flex: 1,
@@ -132,37 +169,61 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   macroItem: {
+    gap: 4,
+  },
+  macroHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    justifyContent: 'space-between',
   },
-  macroTextColumn: {
-    flex: 1,
+  macroTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  macroDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  macroLabel: {
+    fontSize: 11,
+    fontWeight: '600',
   },
   macroValue: {
-    fontSize: 13,
-    fontWeight: '700',
-    letterSpacing: -0.3,
-    color: '#FFFFFF',
-  },
-  calorieNumber: {
-    fontSize: 30,
+    fontSize: 12,
     fontWeight: '800',
-    letterSpacing: -0.8,
-    color: '#FFFFFF',
   },
-  targetCaption: {
+  macroTarget: {
+    fontWeight: '500',
     fontSize: 11,
-    marginTop: 2,
-    color: colors.muted,
   },
-  remainingRow: {
+  track: {
+    height: 6,
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  fill: {
+    height: '100%',
+    borderRadius: 3,
+  },
+  footerRow: {
     alignItems: 'center',
     marginTop: spacing.md,
+    paddingTop: spacing.xs,
+    borderTopWidth: 1,
   },
-  boldRemaining: {
+  remainingPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  remainingText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  remainingValue: {
     fontWeight: '800',
-    color: '#FFFFFF',
   },
 });
-

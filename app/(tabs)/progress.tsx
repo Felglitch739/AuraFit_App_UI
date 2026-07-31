@@ -1,230 +1,271 @@
-/**
- * Progress — VisionOS-style Glassmorphism & Apple Design Spatial Minimalist.
- */
-
 import React, { useState } from 'react';
-import { ScrollView, View, StyleSheet } from 'react-native';
+import { ScrollView, View, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { GlassCard, TitleLarge, TitleSmall, LabelMedium, BodySmall, Caption } from '@/components/ui';
-import { colors, spacing } from '@/constants/theme';
+import { MeshBackground, GlassCard, LabelMedium, BodySmall, Caption } from '@/components/ui';
+import { spacing } from '@/constants/theme';
 import { mockWeightHistory, mockWellnessHistory } from '@/data/mock';
-import { Lightning, Moon, Brain, Smiley, SmileyMeh, SmileySad, Star, WarningCircle, Fire, Trophy, Clock, CaretDown } from 'phosphor-react-native';
+import { Lightning, Moon, Brain, Smiley, SmileyMeh, SmileySad, Star, WarningCircle, Fire, Trophy, Clock, CaretDown, TrendDown, TrendUp } from 'phosphor-react-native';
 import type { MoodType } from '@/types';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function ProgressScreen() {
+  const { colors, isDark } = useTheme();
   const [expandedWellnessId, setExpandedWellnessId] = useState<string | null>(null);
 
   const latestWeight = mockWeightHistory[mockWeightHistory.length - 1];
   const firstWeight = mockWeightHistory[0];
   const weightChange = latestWeight.weight - firstWeight.weight;
+  const isLoss = weightChange <= 0;
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        <Animated.View entering={FadeInDown.duration(300)}>
-          <TitleLarge style={styles.pageTitle}>Progreso</TitleLarge>
-          <BodySmall color={colors.muted} style={styles.subtitle}>
-            Tu evolución a lo largo del tiempo
-          </BodySmall>
-        </Animated.View>
+    <MeshBackground>
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <Animated.View entering={FadeInDown.duration(350)} style={styles.header}>
+            <Text style={[styles.pageTitle, { color: colors.foreground }]}>Progreso</Text>
+            <BodySmall style={{ color: colors.muted, marginTop: 4 }}>
+              Tu evolución a lo largo del tiempo
+            </BodySmall>
+          </Animated.View>
 
-        {/* 1. HERO GLASS CARD — Peso corporal */}
-        <Animated.View entering={FadeInDown.delay(100).duration(350)}>
-          <GlassCard level="hero" style={styles.heroGlass}>
-            <View style={styles.heroHeader}>
-              <View style={styles.heroMainColumn}>
-                <Caption style={styles.heroSubLabel}>PESO ACTUAL</Caption>
+          {/* 1. HERO GLASS CARD — Peso corporal */}
+          <Animated.View entering={FadeInDown.delay(100).duration(350)}>
+            <GlassCard level="hero" style={styles.heroGlass}>
+              <Text style={[styles.sectionHeader, { color: colors.muted }]}>PESO ACTUAL</Text>
+
+              <View style={styles.heroHeader}>
                 <View style={styles.weightValueRow}>
-                  <LabelMedium style={styles.weightNumber}>{latestWeight.weight}</LabelMedium>
-                  <Caption style={styles.unitText}>kg</Caption>
+                  <Text style={[styles.weightNumber, { color: colors.foreground }]}>{latestWeight.weight}</Text>
+                  <Text style={[styles.unitText, { color: colors.muted }]}>kg</Text>
+                </View>
+
+                <View
+                  style={[
+                    styles.weightChangeBadge,
+                    {
+                      backgroundColor: isLoss
+                        ? isDark ? 'rgba(48, 209, 88, 0.14)' : 'rgba(52, 199, 89, 0.12)'
+                        : isDark ? 'rgba(255, 159, 10, 0.14)' : 'rgba(255, 149, 0, 0.12)',
+                      borderColor: isLoss ? colors.success : colors.warning,
+                    },
+                  ]}
+                >
+                  {isLoss ? (
+                    <TrendDown size={14} color={colors.success} weight="bold" />
+                  ) : (
+                    <TrendUp size={14} color={colors.warning} weight="bold" />
+                  )}
+                  <Text style={[styles.weightDeltaText, { color: isLoss ? colors.success : colors.warning }]}>
+                    {weightChange > 0 ? '+' : ''}{weightChange.toFixed(1)} kg
+                  </Text>
+                  <Text style={[styles.weightDeltaSub, { color: colors.muted }]}>vs inicio</Text>
                 </View>
               </View>
 
-              <View style={styles.weightChangeBadge}>
-                <LabelMedium style={styles.weightDeltaText}>
-                  {weightChange > 0 ? '+' : ''}{weightChange.toFixed(1)} kg
-                </LabelMedium>
-                <Caption style={styles.weightDeltaSub}>vs inicio</Caption>
+              {/* Bar graph */}
+              <View style={styles.chartContainer}>
+                {mockWeightHistory.map((entry, index) => {
+                  const min = Math.min(...mockWeightHistory.map((e) => e.weight));
+                  const max = Math.max(...mockWeightHistory.map((e) => e.weight));
+                  const range = max - min || 1;
+                  const normalizedHeight = ((entry.weight - min) / range) * 65 + 20;
+                  const isLast = index === mockWeightHistory.length - 1;
+
+                  return (
+                    <View key={entry.date} style={styles.chartBarColumn}>
+                      <View style={styles.barWrapper}>
+                        <View
+                          style={[
+                            styles.chartBar,
+                            {
+                              height: normalizedHeight,
+                              backgroundColor: isLast ? colors.primary : isDark ? 'rgba(255, 255, 255, 0.10)' : '#E5E5EA',
+                            },
+                          ]}
+                        />
+                      </View>
+                      <Caption style={[styles.chartLabel, { color: isLast ? colors.primary : colors.muted }]}>
+                        {entry.date.slice(5, 10)}
+                      </Caption>
+                    </View>
+                  );
+                })}
               </View>
+            </GlassCard>
+          </Animated.View>
+
+          {/* 2. MODULAR GRID — Historial de entrenamientos */}
+          <Animated.View entering={FadeInDown.delay(200).duration(350)} style={styles.secondarySection}>
+            <Text style={[styles.sectionTitleHeader, { color: colors.muted }]}>HISTORIAL DE ENTRENAMIENTOS</Text>
+            
+            <View style={styles.statsGridRow}>
+              {/* Stat 1: Este mes */}
+              <GlassCard level="medium" style={styles.statTile}>
+                <View style={[styles.statIconBadge, { backgroundColor: isDark ? 'rgba(255, 159, 10, 0.14)' : 'rgba(255, 149, 0, 0.10)', borderColor: colors.orange }]}>
+                  <Fire size={20} color={colors.orange} weight="fill" />
+                </View>
+                <Text style={[styles.statTileValue, { color: colors.foreground }]}>12</Text>
+                <Caption style={[styles.statTileLabel, { color: colors.muted }]} numberOfLines={1}>
+                  Este mes
+                </Caption>
+              </GlassCard>
+
+              {/* Stat 2: Total */}
+              <GlassCard level="medium" style={styles.statTile}>
+                <View style={[styles.statIconBadge, { backgroundColor: isDark ? 'rgba(94, 92, 230, 0.14)' : 'rgba(88, 86, 214, 0.10)', borderColor: colors.purple }]}>
+                  <Trophy size={20} color={colors.purple} weight="fill" />
+                </View>
+                <Text style={[styles.statTileValue, { color: colors.foreground }]}>47</Text>
+                <Caption style={[styles.statTileLabel, { color: colors.muted }]} numberOfLines={1}>
+                  Total
+                </Caption>
+              </GlassCard>
+
+              {/* Stat 3: Tiempo total */}
+              <GlassCard level="medium" style={styles.statTile}>
+                <View style={[styles.statIconBadge, { backgroundColor: isDark ? 'rgba(10, 132, 255, 0.14)' : 'rgba(0, 122, 255, 0.10)', borderColor: colors.primary }]}>
+                  <Clock size={20} color={colors.primary} weight="fill" />
+                </View>
+                <Text style={[styles.statTileValue, { color: colors.foreground }]}>38h</Text>
+                <Caption style={[styles.statTileLabel, { color: colors.muted }]} numberOfLines={1}>
+                  Tiempo total
+                </Caption>
+              </GlassCard>
             </View>
+          </Animated.View>
 
-            {/* High impact weight curve chart */}
-            <View style={styles.chartContainer}>
-              {mockWeightHistory.map((entry, index) => {
-                const min = Math.min(...mockWeightHistory.map((e) => e.weight));
-                const max = Math.max(...mockWeightHistory.map((e) => e.weight));
-                const range = max - min || 1;
-                const normalizedHeight = ((entry.weight - min) / range) * 70 + 18;
-
-                const isLast = index === mockWeightHistory.length - 1;
+          {/* 3. TENDENCIA DE BIENESTAR */}
+          <Animated.View entering={FadeInDown.delay(300).duration(350)} style={styles.secondarySection}>
+            <Text style={[styles.sectionTitleHeader, { color: colors.muted }]}>TENDENCIA DE BIENESTAR</Text>
+            <View style={styles.wellnessList}>
+              {mockWellnessHistory.slice(-4).reverse().map((entry) => {
+                const isExpanded = expandedWellnessId === entry.id;
 
                 return (
-                  <View key={entry.date} style={styles.chartBarColumn}>
-                    <View
-                      style={[
-                        styles.chartBar,
-                        {
-                          height: normalizedHeight,
-                          backgroundColor: isLast ? '#0A84FF' : 'rgba(255, 255, 255, 0.12)',
-                        },
-                      ]}
-                    />
-                    <Caption style={[styles.chartLabel, isLast && styles.chartLabelActive]}>
-                      {entry.date.slice(5, 10)}
-                    </Caption>
-                  </View>
+                  <GlassCard
+                    key={entry.id}
+                    level="medium"
+                    padding={0}
+                    onPress={() => setExpandedWellnessId(isExpanded ? null : entry.id)}
+                    style={styles.wellnessGlassItem}
+                  >
+                    <View style={styles.wellnessHeaderRow}>
+                      <View style={[styles.dateBadge, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#F2F2F7', borderColor: colors.borderLight }]}>
+                        <Text style={[styles.dateText, { color: colors.foreground }]}>{entry.date.slice(5, 10)}</Text>
+                      </View>
+
+                      <View style={styles.quickMetricsRow}>
+                        <View style={[styles.miniMetricPill, { backgroundColor: isDark ? 'rgba(255, 159, 10, 0.14)' : 'rgba(255, 149, 0, 0.10)', borderColor: colors.orange }]}>
+                          <Lightning size={14} color={colors.orange} weight="fill" />
+                          <Text style={[styles.pillText, { color: colors.orange }]}>{entry.energy}/5</Text>
+                        </View>
+
+                        <View style={styles.moodPill}>
+                          {getMoodIcon(entry.mood, 16, colors)}
+                        </View>
+
+                        <CaretDown
+                          size={16}
+                          color={colors.muted}
+                          style={{ transform: [{ rotate: isExpanded ? '180deg' : '0deg' }] }}
+                        />
+                      </View>
+                    </View>
+
+                    {/* Expanded detail view */}
+                    {isExpanded && (
+                      <Animated.View entering={FadeInDown.duration(200)} style={[styles.expandedDetailsContainer, { borderTopColor: colors.borderLight }]}>
+                        <View style={styles.expandedMetric}>
+                          <View style={[styles.detailIconBadge, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#F2F2F7' }]}>
+                            <Moon size={14} color={colors.purple} weight="fill" />
+                          </View>
+                          <Caption style={{ color: colors.muted }}>Sueño:</Caption>
+                          <LabelMedium style={{ color: colors.foreground, fontWeight: '800' }}>{entry.sleepHours}h</LabelMedium>
+                        </View>
+
+                        <View style={styles.expandedMetric}>
+                          <View style={[styles.detailIconBadge, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : '#F2F2F7' }]}>
+                            <Brain size={14} color={colors.primary} weight="fill" />
+                          </View>
+                          <Caption style={{ color: colors.muted }}>Estrés:</Caption>
+                          <LabelMedium style={{ color: colors.foreground, fontWeight: '800' }}>{entry.stress}/5</LabelMedium>
+                        </View>
+                      </Animated.View>
+                    )}
+                  </GlassCard>
                 );
               })}
             </View>
-          </GlassCard>
-        </Animated.View>
-
-        {/* 2. UNIFIED SPATIAL GLASS SECTION — Historial de entrenamientos */}
-        <Animated.View entering={FadeInDown.delay(200).duration(350)} style={styles.secondarySection}>
-          <TitleSmall style={styles.sectionTitle}>Historial de entrenamientos</TitleSmall>
-          <GlassCard level="subtle" padding={0} style={styles.unifiedStatBar}>
-            <View style={styles.statItem}>
-              <View style={[styles.statIconBadge, { backgroundColor: 'rgba(255, 159, 10, 0.16)', borderColor: 'rgba(255, 159, 10, 0.30)' }]}>
-                <Fire size={16} color="#FF9F0A" weight="fill" />
-              </View>
-              <LabelMedium style={styles.statValue}>12</LabelMedium>
-              <Caption style={styles.statLabel}>Este mes</Caption>
-            </View>
-
-            <View style={styles.statDivider} />
-
-            <View style={styles.statItem}>
-              <View style={[styles.statIconBadge, { backgroundColor: 'rgba(255, 55, 95, 0.16)', borderColor: 'rgba(255, 55, 95, 0.30)' }]}>
-                <Trophy size={16} color="#FF375F" weight="fill" />
-              </View>
-              <LabelMedium style={styles.statValue}>47</LabelMedium>
-              <Caption style={styles.statLabel}>Total</Caption>
-            </View>
-
-            <View style={styles.statDivider} />
-
-            <View style={styles.statItem}>
-              <View style={[styles.statIconBadge, { backgroundColor: 'rgba(94, 92, 230, 0.16)', borderColor: 'rgba(94, 92, 230, 0.30)' }]}>
-                <Clock size={16} color="#5E5CE6" weight="fill" />
-              </View>
-              <LabelMedium style={styles.statValue}>38h</LabelMedium>
-              <Caption style={styles.statLabel}>Tiempo total</Caption>
-            </View>
-          </GlassCard>
-        </Animated.View>
-
-        {/* 3. COLLAPSIBLE GLASS WELLNESS TRENDS */}
-        <Animated.View entering={FadeInDown.delay(300).duration(350)} style={styles.secondarySection}>
-          <TitleSmall style={styles.sectionTitle}>Tendencia de bienestar</TitleSmall>
-          <View style={styles.wellnessList}>
-            {mockWellnessHistory.slice(-4).reverse().map((entry) => {
-              const isExpanded = expandedWellnessId === entry.id;
-
-              return (
-                <GlassCard
-                  key={entry.id}
-                  level="medium"
-                  padding={0}
-                  onPress={() => setExpandedWellnessId(isExpanded ? null : entry.id)}
-                  style={styles.wellnessGlassItem}
-                >
-                  <View style={styles.wellnessHeaderRow}>
-                    <View style={styles.dateBadge}>
-                      <Caption style={styles.dateText}>{entry.date.slice(5, 10)}</Caption>
-                    </View>
-
-                    <View style={styles.quickMetricsRow}>
-                      <View style={styles.miniMetricPill}>
-                        <Lightning size={14} color="#FF9F0A" weight="fill" />
-                        <Caption style={styles.pillText}>{entry.energy}/5</Caption>
-                      </View>
-
-                      {getMoodIcon(entry.mood, 18)}
-
-                      <CaretDown
-                        size={16}
-                        color="#9898A0"
-                        style={{ transform: [{ rotate: isExpanded ? '180deg' : '0deg' }] }}
-                      />
-                    </View>
-                  </View>
-
-                  {/* Expanded detail view */}
-                  {isExpanded && (
-                    <Animated.View entering={FadeInDown.duration(200)} style={styles.expandedDetailsContainer}>
-                      <View style={styles.expandedMetric}>
-                        <Moon size={16} color="#5E5CE6" weight="fill" />
-                        <Caption style={{ color: '#9898A0' }}>Sueño:</Caption>
-                        <LabelMedium style={styles.detailValue}>{entry.sleepHours}h</LabelMedium>
-                      </View>
-
-                      <View style={styles.expandedMetric}>
-                        <Brain size={16} color="#0A84FF" weight="fill" />
-                        <Caption style={{ color: '#9898A0' }}>Estrés:</Caption>
-                        <LabelMedium style={styles.detailValue}>{entry.stress}/5</LabelMedium>
-                      </View>
-                    </Animated.View>
-                  )}
-                </GlassCard>
-              );
-            })}
-          </View>
-        </Animated.View>
-        
-        <View style={{ height: 40 }} />
-      </ScrollView>
-    </SafeAreaView>
+          </Animated.View>
+          
+          <View style={{ height: 110 }} />
+        </ScrollView>
+      </SafeAreaView>
+    </MeshBackground>
   );
 }
 
-function getMoodIcon(mood: MoodType, size: number) {
+function getMoodIcon(mood: MoodType, size: number, colors: any) {
   switch (mood) {
     case 'excellent':
-      return <Star size={size} color="#FFD60A" weight="fill" />;
+      return <Star size={size} color={colors.accent} weight="fill" />;
     case 'good':
-      return <Smiley size={size} color="#30D158" weight="fill" />;
+      return <Smiley size={size} color={colors.success} weight="fill" />;
     case 'neutral':
-      return <SmileyMeh size={size} color="#9898A0" weight="fill" />;
+      return <SmileyMeh size={size} color={colors.muted} weight="fill" />;
     case 'sad':
-      return <SmileySad size={size} color="#FF9F0A" weight="fill" />;
+      return <SmileySad size={size} color={colors.warning} weight="fill" />;
     case 'stressed':
-      return <WarningCircle size={size} color="#FF453A" weight="fill" />;
+      return <WarningCircle size={size} color={colors.destructive} weight="fill" />;
     default:
-      return <Smiley size={size} color="#9898A0" weight="fill" />;
+      return <Smiley size={size} color={colors.muted} weight="fill" />;
   }
 }
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#0A0A0F',
   },
   container: {
     flex: 1,
   },
   content: {
     padding: spacing.md,
-    paddingBottom: 180,
+    paddingBottom: 40,
+  },
+  header: {
+    marginTop: spacing.xs,
+    marginBottom: spacing.lg,
   },
   pageTitle: {
     fontSize: 32,
-    fontWeight: '700',
-    letterSpacing: -0.5,
-    color: '#F2F2F7',
+    fontWeight: '800',
+    letterSpacing: -0.8,
+    lineHeight: 38,
   },
-  subtitle: {
-    marginTop: 2,
-    marginBottom: spacing.lg,
-    color: '#9898A0',
+  sectionHeader: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+    marginBottom: spacing.xs,
+    textTransform: 'uppercase',
   },
-  // HERO GLASS CARD
+  sectionTitleHeader: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+    marginBottom: spacing.sm,
+    textTransform: 'uppercase',
+  },
   heroGlass: {
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
+    padding: spacing.md,
   },
   heroHeader: {
     flexDirection: 'row',
@@ -232,51 +273,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.md,
   },
-  heroMainColumn: {
-    flex: 1,
-    marginRight: spacing.sm,
-  },
-  heroSubLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 0.8,
-    color: '#9898A0',
-    marginBottom: 2,
-  },
   weightValueRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
     gap: 4,
   },
   weightNumber: {
-    fontSize: 32,
-    fontWeight: '700',
-    letterSpacing: -0.8,
-    color: '#F2F2F7',
-    lineHeight: 38,
+    fontSize: 40,
+    fontWeight: '800',
+    letterSpacing: -1,
+    lineHeight: 44,
   },
   unitText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
-    color: '#9898A0',
   },
   weightChangeBadge: {
-    backgroundColor: 'rgba(48, 209, 88, 0.14)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 10,
-    alignItems: 'flex-end',
+    paddingVertical: 6,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(48, 209, 88, 0.22)',
   },
   weightDeltaText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#30D158',
+    fontSize: 13,
+    fontWeight: '800',
   },
   weightDeltaSub: {
-    fontSize: 9,
-    color: '#30D158',
+    fontSize: 10,
+    fontWeight: '500',
   },
   chartContainer: {
     flexDirection: 'row',
@@ -289,6 +316,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
+  barWrapper: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
   chartBar: {
     width: 14,
     borderRadius: 7,
@@ -296,58 +327,41 @@ const styles = StyleSheet.create({
   chartLabel: {
     marginTop: spacing.xs,
     fontSize: 10,
-    color: '#9898A0',
+    fontWeight: '600',
   },
-  chartLabelActive: {
-    color: '#F2F2F7',
-    fontWeight: '700',
-  },
-  // SECONDARY SECTION
   secondarySection: {
-    marginVertical: spacing.sm,
+    marginVertical: spacing.xs,
   },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#F2F2F7',
-    marginBottom: spacing.sm,
-  },
-  unifiedStatBar: {
+  statsGridRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingVertical: 14,
+    gap: spacing.sm,
   },
-  statItem: {
+  statTile: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  statDivider: {
-    width: 1,
-    height: 36,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xs,
   },
   statIconBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 4,
+    marginBottom: spacing.xs + 2,
     borderWidth: 1,
   },
-  statValue: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#F2F2F7',
-    marginBottom: 1,
+  statTileValue: {
+    fontSize: 22,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+    marginBottom: 2,
   },
-  statLabel: {
-    fontSize: 10,
-    color: '#9898A0',
+  statTileLabel: {
+    fontSize: 11,
+    fontWeight: '600',
   },
-  // WELLNESS LIST
   wellnessList: {
     gap: spacing.xs,
   },
@@ -361,15 +375,14 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   dateBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
   },
   dateText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#F2F2F7',
+    fontSize: 12,
+    fontWeight: '700',
   },
   quickMetricsRow: {
     flexDirection: 'row',
@@ -379,16 +392,19 @@ const styles = StyleSheet.create({
   miniMetricPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 159, 10, 0.14)',
+    borderWidth: 1,
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 6,
+    borderRadius: 8,
     gap: 4,
   },
   pillText: {
     fontSize: 11,
-    fontWeight: '700',
-    color: '#FF9F0A',
+    fontWeight: '800',
+  },
+  moodPill: {
+    paddingHorizontal: 6,
+    paddingVertical: 3,
   },
   expandedDetailsContainer: {
     flexDirection: 'row',
@@ -396,17 +412,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.05)',
-    paddingTop: spacing.xs,
+    paddingTop: spacing.sm,
   },
   expandedMetric: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
   },
-  detailValue: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#F2F2F7',
+  detailIconBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

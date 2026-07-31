@@ -1,60 +1,62 @@
 import React from 'react';
-import { ScrollView, View, StyleSheet } from 'react-native';
+import { ScrollView, View, StyleSheet, Pressable, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Card, TitleSmall, Button, LabelMedium, BodySmall } from '@/components/ui';
-import { colors, spacing } from '@/constants/theme';
+import { MeshBackground, GlassCard, TitleSmall, LabelMedium, BodySmall } from '@/components/ui';
+import { spacing } from '@/constants/theme';
 import { CaretLeft } from 'phosphor-react-native';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function TermsScreen() {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <View style={styles.header}>
-        <Button
-          title=""
-          variant="outline"
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <CaretLeft size={22} color={colors.text} />
-        </Button>
-        <TitleSmall style={styles.headerTitle}>Términos de servicio</TitleSmall>
-        <View style={{ width: 44 }} />
-      </View>
+    <MeshBackground>
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <View style={styles.header}>
+          <Pressable
+            onPress={() => router.back()}
+            style={[styles.backButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#E5E5EA' }]}
+            accessibilityLabel="Volver"
+          >
+            <CaretLeft size={20} color={colors.foreground} />
+          </Pressable>
+          <TitleSmall style={[styles.headerTitle, { color: colors.foreground }]}>Términos de servicio</TitleSmall>
+          <View style={{ width: 40 }} />
+        </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Card style={styles.card}>
-          <LabelMedium style={styles.title}>1. Aceptación de los Términos</LabelMedium>
-          <BodySmall color={colors.muted} style={styles.paragraph}>
-            Al descargar, instalar o utilizar AuraFit, aceptas quedar vinculado por estos Términos de Servicio y por nuestra Política de Privacidad.
-          </BodySmall>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <GlassCard level="hero" style={styles.card}>
+            <LabelMedium style={[styles.title, { color: colors.foreground }]}>1. Aceptación de los Términos</LabelMedium>
+            <BodySmall style={[styles.paragraph, { color: colors.muted }]}>
+              Al descargar, instalar o utilizar AuraFit, aceptas quedar vinculado por estos Términos de Servicio y por nuestra Política de Privacidad.
+            </BodySmall>
 
-          <LabelMedium style={styles.title}>2. Uso de la Aplicación y Salud</LabelMedium>
-          <BodySmall color={colors.muted} style={styles.paragraph}>
-            AuraFit ofrece recomendaciones de entrenamiento y nutrición basadas en modelos de datos. Esta información tiene carácter exclusivamente informativo y no constituye consejo médico ni diagnóstico profesional.
-          </BodySmall>
+            <LabelMedium style={[styles.title, { color: colors.foreground }]}>2. Uso de la Aplicación y Salud</LabelMedium>
+            <BodySmall style={[styles.paragraph, { color: colors.muted }]}>
+              AuraFit ofrece recomendaciones de entrenamiento y nutrición basadas en modelos de datos. Esta información tiene carácter exclusivamente informativo y no constituye consejo médico ni diagnóstico profesional.
+            </BodySmall>
 
-          <LabelMedium style={styles.title}>3. Privacidad y Datos de Usuario</LabelMedium>
-          <BodySmall color={colors.muted} style={styles.paragraph}>
-            Tus datos de salud, progreso y perfil se almacenan de forma segura y nunca se venderán a terceros. Puedes solicitar la exportación o eliminación completa de tu información en cualquier momento desde la sección Privacidad.
-          </BodySmall>
+            <LabelMedium style={[styles.title, { color: colors.foreground }]}>3. Privacidad y Datos de Usuario</LabelMedium>
+            <BodySmall style={[styles.paragraph, { color: colors.muted }]}>
+              Tus datos de salud, progreso y perfil se almacenan de forma segura y nunca se venderán a terceros. Puedes solicitar la exportación o eliminación completa de tu información en cualquier momento desde la sección Privacidad.
+            </BodySmall>
 
-          <LabelMedium style={styles.title}>4. Modificaciones</LabelMedium>
-          <BodySmall color={colors.muted} style={styles.paragraph}>
-            Nos reservamos el derecho de actualizar estos términos en cualquier momento. El uso continuado de la aplicación tras dichos cambios constituye tu aceptación de los nuevos términos.
-          </BodySmall>
-        </Card>
-      </ScrollView>
-    </SafeAreaView>
+            <LabelMedium style={[styles.title, { color: colors.foreground }]}>4. Modificaciones</LabelMedium>
+            <BodySmall style={[styles.paragraph, { color: colors.muted }]}>
+              Nos reservamos el derecho de actualizar estos términos en cualquier momento. El uso continuado de la aplicación tras dichos cambios constituye tu aceptación de los nuevos términos.
+            </BodySmall>
+          </GlassCard>
+        </ScrollView>
+      </SafeAreaView>
+    </MeshBackground>
   );
 }
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
   },
   header: {
     flexDirection: 'row',
@@ -67,7 +69,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    paddingHorizontal: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -79,15 +80,12 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
     padding: spacing.lg,
   },
   title: {
     fontSize: 15,
     fontWeight: '700',
     marginBottom: 4,
-    color: colors.text,
   },
   paragraph: {
     fontSize: 13,

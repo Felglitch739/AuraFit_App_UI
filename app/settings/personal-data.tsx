@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { ScrollView, View, StyleSheet } from 'react-native';
+import { ScrollView, View, StyleSheet, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Card, TitleLarge, TitleSmall, Input, Button, LabelMedium } from '@/components/ui';
-import { colors, spacing } from '@/constants/theme';
+import { MeshBackground, GlassCard, TitleSmall, Input, Button, LabelMedium } from '@/components/ui';
+import { spacing } from '@/constants/theme';
 import { CaretLeft } from 'phosphor-react-native';
 import { useUserStore } from '@/store/useUserStore';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function PersonalDataScreen() {
   const router = useRouter();
-  const { profile, setProfile } = useUserStore((state) => state);
+  const { colors, isDark } = useTheme();
+  const { profile, updateProfile } = useUserStore((state) => state);
 
   const [name, setName] = useState(profile.name || 'Ana');
   const [email, setEmail] = useState('ana@example.com');
@@ -18,70 +20,70 @@ export default function PersonalDataScreen() {
   const [height, setHeight] = useState(String(profile.height || 165));
 
   const handleSave = () => {
-    setProfile({
+    updateProfile({
       name,
-      age: Number(age),
-      weight: Number(weight),
-      height: Number(height),
+      age: String(age),
+      weight: String(weight),
+      height: String(height),
     });
     router.back();
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <View style={styles.header}>
-        <Button
-          title=""
-          variant="outline"
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <CaretLeft size={22} color={colors.text} />
-        </Button>
-        <TitleSmall style={styles.headerTitle}>Datos personales</TitleSmall>
-        <View style={{ width: 44 }} />
-      </View>
+    <MeshBackground>
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <View style={styles.header}>
+          <Pressable
+            onPress={() => router.back()}
+            style={[styles.backButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#E5E5EA' }]}
+            accessibilityLabel="Volver"
+          >
+            <CaretLeft size={20} color={colors.foreground} />
+          </Pressable>
+          <TitleSmall style={[styles.headerTitle, { color: colors.foreground }]}>Datos personales</TitleSmall>
+          <View style={{ width: 40 }} />
+        </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Card style={styles.card}>
-          <View style={styles.inputGroup}>
-            <LabelMedium style={styles.label}>Nombre completo</LabelMedium>
-            <Input value={name} onChangeText={setName} placeholder="Tu nombre" />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <LabelMedium style={styles.label}>Correo electrónico</LabelMedium>
-            <Input value={email} onChangeText={setEmail} placeholder="tu@email.com" />
-          </View>
-
-          <View style={styles.inputRow}>
-            <View style={[styles.inputGroup, { flex: 1 }]}>
-              <LabelMedium style={styles.label}>Edad</LabelMedium>
-              <Input value={age} onChangeText={setAge} keyboardType="numeric" placeholder="28" />
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <GlassCard level="hero" style={styles.card}>
+            <View style={styles.inputGroup}>
+              <LabelMedium style={[styles.label, { color: colors.muted }]}>Nombre completo</LabelMedium>
+              <Input value={name} onChangeText={setName} placeholder="Tu nombre" />
             </View>
 
-            <View style={[styles.inputGroup, { flex: 1 }]}>
-              <LabelMedium style={styles.label}>Peso (kg)</LabelMedium>
-              <Input value={weight} onChangeText={setWeight} keyboardType="numeric" placeholder="62" />
+            <View style={styles.inputGroup}>
+              <LabelMedium style={[styles.label, { color: colors.muted }]}>Correo electrónico</LabelMedium>
+              <Input value={email} onChangeText={setEmail} placeholder="tu@email.com" />
             </View>
 
-            <View style={[styles.inputGroup, { flex: 1 }]}>
-              <LabelMedium style={styles.label}>Altura (cm)</LabelMedium>
-              <Input value={height} onChangeText={setHeight} keyboardType="numeric" placeholder="165" />
-            </View>
-          </View>
-        </Card>
+            <View style={styles.inputRow}>
+              <View style={[styles.inputGroup, { flex: 1 }]}>
+                <LabelMedium style={[styles.label, { color: colors.muted }]}>Edad</LabelMedium>
+                <Input value={age} onChangeText={setAge} keyboardType="numeric" placeholder="28" />
+              </View>
 
-        <Button title="Guardar cambios" onPress={handleSave} variant="primary" style={styles.saveButton} />
-      </ScrollView>
-    </SafeAreaView>
+              <View style={[styles.inputGroup, { flex: 1 }]}>
+                <LabelMedium style={[styles.label, { color: colors.muted }]}>Peso (kg)</LabelMedium>
+                <Input value={weight} onChangeText={setWeight} keyboardType="numeric" placeholder="62" />
+              </View>
+
+              <View style={[styles.inputGroup, { flex: 1 }]}>
+                <LabelMedium style={[styles.label, { color: colors.muted }]}>Altura (cm)</LabelMedium>
+                <Input value={height} onChangeText={setHeight} keyboardType="numeric" placeholder="165" />
+              </View>
+            </View>
+          </GlassCard>
+
+          <Button title="Guardar cambios" onPress={handleSave} variant="primary" style={styles.saveButton} />
+        </ScrollView>
+      </SafeAreaView>
+    </MeshBackground>
   );
 }
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
   },
   header: {
     flexDirection: 'row',
@@ -94,7 +96,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    paddingHorizontal: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -106,8 +107,6 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
     padding: spacing.md,
     marginBottom: spacing.lg,
     gap: spacing.md,
@@ -122,7 +121,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#8E8E93',
   },
   saveButton: {
     marginTop: spacing.sm,

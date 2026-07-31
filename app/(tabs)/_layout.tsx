@@ -5,6 +5,7 @@ import { View, ActivityIndicator } from 'react-native';
 import { FloatingTabBar } from '@/components/navigation/FloatingTabBar';
 import { colors } from '@/constants/theme';
 import { useUserStore } from '@/store/useUserStore';
+import { House, Barbell, ForkKnife, ChartLineUp, User } from 'phosphor-react-native';
 
 export default function TabLayout() {
   // Esperar a que Zustand cargue de AsyncStorage

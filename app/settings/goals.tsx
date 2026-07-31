@@ -1,118 +1,122 @@
 import React, { useState } from 'react';
-import { ScrollView, View, StyleSheet, Pressable } from 'react-native';
+import { ScrollView, View, StyleSheet, Pressable, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Card, TitleSmall, Button, LabelMedium, BodySmall, Caption } from '@/components/ui';
-import { colors, spacing } from '@/constants/theme';
+import { MeshBackground, GlassCard, TitleSmall, Button, LabelMedium, BodySmall, Caption } from '@/components/ui';
+import { spacing } from '@/constants/theme';
 import { CaretLeft, Check, Target, Trophy, Pulse } from 'phosphor-react-native';
-import { useUserStore } from '@/store/useUserStore';
-import type { PrimaryGoal, FitnessLevel } from '@/types';
+import { useUserStore, type UserProfile } from '@/store/useUserStore';
+import { useTheme } from '@/hooks/useTheme';
 
-const GOAL_OPTIONS: { key: PrimaryGoal; label: string; desc: string; icon: any }[] = [
-  { key: 'lose_weight', label: 'Perder peso', desc: 'Reducir grasa manteniendo masa muscular', icon: Target },
-  { key: 'build_muscle', label: 'Ganar músculo', desc: 'Aumentar fuerza y volumen muscular', icon: Trophy },
-  { key: 'maintain', label: 'Mantenimiento', desc: 'Mantener peso y mejorar salud general', icon: Pulse },
+type GoalType = UserProfile['goal'];
+type ActivityType = UserProfile['activityLevel'];
+
+const GOAL_OPTIONS: { key: GoalType; label: string; desc: string; icon: any }[] = [
+  { key: 'weight_loss', label: 'Perder peso', desc: 'Reducir grasa manteniendo masa muscular', icon: Target },
+  { key: 'muscle', label: 'Ganar músculo', desc: 'Aumentar fuerza y volumen muscular', icon: Trophy },
+  { key: 'maintenance', label: 'Mantenimiento', desc: 'Mantener peso y mejorar salud general', icon: Pulse },
 ];
 
-const LEVEL_OPTIONS: { key: FitnessLevel; label: string; desc: string }[] = [
-  { key: 'beginner', label: 'Principiante', desc: 'Menos de 6 meses entrenando' },
-  { key: 'intermediate', label: 'Intermedio', desc: '6 meses a 2 años constantes' },
-  { key: 'advanced', label: 'Avanzado', desc: 'Más de 2 años de experiencia' },
+const LEVEL_OPTIONS: { key: ActivityType; label: string; desc: string }[] = [
+  { key: 'light', label: 'Principiante', desc: 'Menos de 6 meses entrenando' },
+  { key: 'moderate', label: 'Intermedio', desc: '6 meses a 2 años constantes' },
+  { key: 'active', label: 'Avanzado', desc: 'Más de 2 años de experiencia' },
 ];
 
 export default function GoalsScreen() {
   const router = useRouter();
-  const { profile, setProfile } = useUserStore((state) => state);
+  const { colors, isDark } = useTheme();
+  const { profile, updateProfile } = useUserStore((state) => state);
 
-  const [selectedGoal, setSelectedGoal] = useState<PrimaryGoal>(profile.primaryGoal || 'build_muscle');
-  const [selectedLevel, setSelectedLevel] = useState<FitnessLevel>(profile.fitnessLevel || 'intermediate');
+  const [selectedGoal, setSelectedGoal] = useState<GoalType>(profile.goal || 'muscle');
+  const [selectedLevel, setSelectedLevel] = useState<ActivityType>(profile.activityLevel || 'moderate');
 
   const handleSave = () => {
-    setProfile({
-      primaryGoal: selectedGoal,
-      fitnessLevel: selectedLevel,
+    updateProfile({
+      goal: selectedGoal,
+      activityLevel: selectedLevel,
     });
     router.back();
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <View style={styles.header}>
-        <Button
-          title=""
-          variant="outline"
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <CaretLeft size={22} color={colors.text} />
-        </Button>
-        <TitleSmall style={styles.headerTitle}>Objetivos y nivel</TitleSmall>
-        <View style={{ width: 44 }} />
-      </View>
+    <MeshBackground>
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <View style={styles.header}>
+          <Pressable
+            onPress={() => router.back()}
+            style={[styles.backButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#E5E5EA' }]}
+            accessibilityLabel="Volver"
+          >
+            <CaretLeft size={20} color={colors.foreground} />
+          </Pressable>
+          <TitleSmall style={[styles.headerTitle, { color: colors.foreground }]}>Objetivos y nivel</TitleSmall>
+          <View style={{ width: 40 }} />
+        </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Goal section */}
-        <Caption style={styles.sectionHeading}>OBJETIVO PRINCIPAL</Caption>
-        <Card style={styles.card} padding={0}>
-          {GOAL_OPTIONS.map((g, idx) => {
-            const Icon = g.icon;
-            const isSelected = selectedGoal === g.key;
-            return (
-              <Pressable
-                key={g.key}
-                onPress={() => setSelectedGoal(g.key)}
-                style={[
-                  styles.optionRow,
-                  idx < GOAL_OPTIONS.length - 1 && styles.borderBottom,
-                ]}
-              >
-                <View style={styles.iconWrapper}>
-                  <Icon size={20} color={colors.primary} />
-                </View>
-                <View style={styles.optionText}>
-                  <LabelMedium style={styles.optionTitle}>{g.label}</LabelMedium>
-                  <BodySmall color={colors.muted}>{g.desc}</BodySmall>
-                </View>
-                {isSelected && <Check size={20} color={colors.primary} weight="bold" />}
-              </Pressable>
-            );
-          })}
-        </Card>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          {/* Goal section */}
+          <Caption style={[styles.sectionHeading, { color: colors.muted }]}>OBJETIVO PRINCIPAL</Caption>
+          <GlassCard level="hero" style={styles.card} padding={0}>
+            {GOAL_OPTIONS.map((g, idx) => {
+              const Icon = g.icon;
+              const isSelected = selectedGoal === g.key;
+              return (
+                <Pressable
+                  key={g.key}
+                  onPress={() => setSelectedGoal(g.key)}
+                  style={[
+                    styles.optionRow,
+                    idx < GOAL_OPTIONS.length - 1 && [styles.borderBottom, { borderBottomColor: colors.borderLight }],
+                  ]}
+                >
+                  <View style={styles.iconWrapper}>
+                    <Icon size={20} color={colors.primary} />
+                  </View>
+                  <View style={styles.optionText}>
+                    <LabelMedium style={[styles.optionTitle, { color: colors.foreground }]}>{g.label}</LabelMedium>
+                    <BodySmall style={{ color: colors.muted }}>{g.desc}</BodySmall>
+                  </View>
+                  {isSelected && <Check size={20} color={colors.primary} weight="bold" />}
+                </Pressable>
+              );
+            })}
+          </GlassCard>
 
-        {/* Level section */}
-        <Caption style={styles.sectionHeading}>NIVEL DE EXPERIENCIA</Caption>
-        <Card style={styles.card} padding={0}>
-          {LEVEL_OPTIONS.map((l, idx) => {
-            const isSelected = selectedLevel === l.key;
-            return (
-              <Pressable
-                key={l.key}
-                onPress={() => setSelectedLevel(l.key)}
-                style={[
-                  styles.optionRow,
-                  idx < LEVEL_OPTIONS.length - 1 && styles.borderBottom,
-                ]}
-              >
-                <View style={styles.optionText}>
-                  <LabelMedium style={styles.optionTitle}>{l.label}</LabelMedium>
-                  <BodySmall color={colors.muted}>{l.desc}</BodySmall>
-                </View>
-                {isSelected && <Check size={20} color={colors.primary} weight="bold" />}
-              </Pressable>
-            );
-          })}
-        </Card>
+          {/* Level section */}
+          <Caption style={[styles.sectionHeading, { color: colors.muted }]}>NIVEL DE EXPERIENCIA</Caption>
+          <GlassCard level="hero" style={styles.card} padding={0}>
+            {LEVEL_OPTIONS.map((l, idx) => {
+              const isSelected = selectedLevel === l.key;
+              return (
+                <Pressable
+                  key={l.key}
+                  onPress={() => setSelectedLevel(l.key)}
+                  style={[
+                    styles.optionRow,
+                    idx < LEVEL_OPTIONS.length - 1 && [styles.borderBottom, { borderBottomColor: colors.borderLight }],
+                  ]}
+                >
+                  <View style={styles.optionText}>
+                    <LabelMedium style={[styles.optionTitle, { color: colors.foreground }]}>{l.label}</LabelMedium>
+                    <BodySmall style={{ color: colors.muted }}>{l.desc}</BodySmall>
+                  </View>
+                  {isSelected && <Check size={20} color={colors.primary} weight="bold" />}
+                </Pressable>
+              );
+            })}
+          </GlassCard>
 
-        <Button title="Guardar cambios" onPress={handleSave} variant="primary" style={styles.saveButton} />
-      </ScrollView>
-    </SafeAreaView>
+          <Button title="Guardar cambios" onPress={handleSave} variant="primary" style={styles.saveButton} />
+        </ScrollView>
+      </SafeAreaView>
+    </MeshBackground>
   );
 }
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
   },
   header: {
     flexDirection: 'row',
@@ -125,7 +129,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    paddingHorizontal: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -139,13 +142,11 @@ const styles = StyleSheet.create({
   sectionHeading: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#8E8E93',
     marginBottom: spacing.xs,
     marginLeft: 4,
+    textTransform: 'uppercase',
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
     marginBottom: spacing.lg,
     overflow: 'hidden',
   },
@@ -156,7 +157,6 @@ const styles = StyleSheet.create({
   },
   borderBottom: {
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.06)',
   },
   iconWrapper: {
     width: 32,

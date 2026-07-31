@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { ScrollView, View, StyleSheet, Switch, Alert } from 'react-native';
+import { ScrollView, View, StyleSheet, Switch, Alert, Pressable, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Card, TitleSmall, Button, LabelMedium, BodySmall, Caption } from '@/components/ui';
-import { colors, spacing } from '@/constants/theme';
+import { MeshBackground, GlassCard, TitleSmall, Button, LabelMedium, BodySmall, Caption } from '@/components/ui';
+import { spacing } from '@/constants/theme';
 import { CaretLeft, DownloadSimple, Trash } from 'phosphor-react-native';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function PrivacyScreen() {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
   const [shareData, setShareData] = useState(false);
 
   const handleExport = () => {
@@ -22,67 +24,57 @@ export default function PrivacyScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <View style={styles.header}>
-        <Button
-          title=""
-          variant="outline"
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <CaretLeft size={22} color={colors.text} />
-        </Button>
-        <TitleSmall style={styles.headerTitle}>Privacidad</TitleSmall>
-        <View style={{ width: 44 }} />
-      </View>
+    <MeshBackground>
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <View style={styles.header}>
+          <Pressable
+            onPress={() => router.back()}
+            style={[styles.backButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#E5E5EA' }]}
+            accessibilityLabel="Volver"
+          >
+            <CaretLeft size={20} color={colors.foreground} />
+          </Pressable>
+          <TitleSmall style={[styles.headerTitle, { color: colors.foreground }]}>Privacidad</TitleSmall>
+          <View style={{ width: 40 }} />
+        </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Caption style={styles.sectionHeading}>DATOS Y TELEMETRÍA</Caption>
-        <Card style={styles.card} padding={0}>
-          <View style={styles.toggleRow}>
-            <View style={styles.toggleText}>
-              <LabelMedium style={styles.toggleTitle}>Compartir métricas anónimas</LabelMedium>
-              <BodySmall color={colors.muted}>Ayuda a mejorar los modelos de recomendación de IA</BodySmall>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <Caption style={[styles.sectionHeading, { color: colors.muted }]}>DATOS Y TELEMETRÍA</Caption>
+          <GlassCard level="hero" style={styles.card} padding={0}>
+            <View style={styles.toggleRow}>
+              <View style={styles.toggleText}>
+                <LabelMedium style={[styles.toggleTitle, { color: colors.foreground }]}>Compartir métricas anónimas</LabelMedium>
+                <BodySmall style={{ color: colors.muted }}>Ayuda a mejorar los modelos de recomendación de IA</BodySmall>
+              </View>
+              <Switch
+                value={shareData}
+                onValueChange={setShareData}
+                trackColor={{ false: '#767577', true: colors.primary }}
+              />
             </View>
-            <Switch
-              value={shareData}
-              onValueChange={setShareData}
-              trackColor={{ false: '#767577', true: colors.primary }}
-            />
-          </View>
-        </Card>
+          </GlassCard>
 
-        <Caption style={styles.sectionHeading}>GESTIÓN DE TUS DATOS</Caption>
-        <Card style={styles.card} padding={0}>
-          <Button
-            title="Exportar mis datos (JSON)"
-            onPress={handleExport}
-            variant="outline"
-            style={styles.actionButton}
-          >
-            <DownloadSimple size={20} color={colors.primary} style={{ marginRight: 8 }} />
-          </Button>
+          <Caption style={[styles.sectionHeading, { color: colors.muted }]}>GESTIÓN DE TUS DATOS</Caption>
+          <GlassCard level="hero" style={styles.card} padding={0}>
+            <Pressable onPress={handleExport} style={[styles.actionRow, styles.borderBottom, { borderBottomColor: colors.borderLight }]}>
+              <DownloadSimple size={20} color={colors.primary} style={{ marginRight: 10 }} />
+              <Text style={[styles.actionText, { color: colors.primary }]}>Exportar mis datos (JSON)</Text>
+            </Pressable>
 
-          <View style={styles.divider} />
-
-          <Button
-            title="Eliminar cuenta y datos"
-            onPress={handleDeleteAccount}
-            variant="outline"
-            style={styles.dangerButton}
-          >
-            <Trash size={20} color="#FF3B30" style={{ marginRight: 8 }} />
-          </Button>
-        </Card>
-      </ScrollView>
-    </SafeAreaView>
+            <Pressable onPress={handleDeleteAccount} style={styles.actionRow}>
+              <Trash size={20} color={colors.destructive} style={{ marginRight: 10 }} />
+              <Text style={[styles.actionText, { color: colors.destructive }]}>Eliminar cuenta y datos</Text>
+            </Pressable>
+          </GlassCard>
+        </ScrollView>
+      </SafeAreaView>
+    </MeshBackground>
   );
 }
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
   },
   header: {
     flexDirection: 'row',
@@ -95,7 +87,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    paddingHorizontal: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -109,13 +100,11 @@ const styles = StyleSheet.create({
   sectionHeading: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#8E8E93',
     marginBottom: spacing.xs,
     marginLeft: 4,
+    textTransform: 'uppercase',
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
     marginBottom: spacing.lg,
     overflow: 'hidden',
   },
@@ -133,20 +122,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 2,
   },
-  divider: {
-    height: 1,
-    backgroundColor: 'rgba(0,0,0,0.06)',
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: spacing.md,
   },
-  actionButton: {
-    borderWidth: 0,
-    justifyContent: 'flex-start',
-    paddingHorizontal: spacing.md,
-    height: 50,
+  borderBottom: {
+    borderBottomWidth: 1,
   },
-  dangerButton: {
-    borderWidth: 0,
-    justifyContent: 'flex-start',
-    paddingHorizontal: spacing.md,
-    height: 50,
+  actionText: {
+    fontSize: 15,
+    fontWeight: '600',
   },
 });

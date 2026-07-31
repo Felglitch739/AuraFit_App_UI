@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { ScrollView, View, StyleSheet, Pressable, Alert } from 'react-native';
+import { ScrollView, View, StyleSheet, Pressable, Alert, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Card, TitleSmall, Button, LabelMedium, BodySmall, Caption } from '@/components/ui';
-import { colors, spacing } from '@/constants/theme';
-import { CaretLeft, CaretDown, EnvelopeSimple, ChatCircleText } from 'phosphor-react-native';
+import { MeshBackground, GlassCard, TitleSmall, Button, LabelMedium, BodySmall, Caption } from '@/components/ui';
+import { spacing } from '@/constants/theme';
+import { CaretLeft, CaretDown, ChatCircleText } from 'phosphor-react-native';
+import { useTheme } from '@/hooks/useTheme';
 
 const FAQS = [
   {
@@ -23,6 +24,7 @@ const FAQS = [
 
 export default function SupportScreen() {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const handleContact = () => {
@@ -30,75 +32,75 @@ export default function SupportScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <View style={styles.header}>
-        <Button
-          title=""
-          variant="outline"
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <CaretLeft size={22} color={colors.text} />
-        </Button>
-        <TitleSmall style={styles.headerTitle}>Ayuda y soporte</TitleSmall>
-        <View style={{ width: 44 }} />
-      </View>
+    <MeshBackground>
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <View style={styles.header}>
+          <Pressable
+            onPress={() => router.back()}
+            style={[styles.backButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#E5E5EA' }]}
+            accessibilityLabel="Volver"
+          >
+            <CaretLeft size={20} color={colors.foreground} />
+          </Pressable>
+          <TitleSmall style={[styles.headerTitle, { color: colors.foreground }]}>Ayuda y soporte</TitleSmall>
+          <View style={{ width: 40 }} />
+        </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Caption style={styles.sectionHeading}>PREGUNTAS FRECUENTES</Caption>
-        <Card style={styles.card} padding={0}>
-          {FAQS.map((item, idx) => {
-            const isOpen = openFaq === idx;
-            return (
-              <View key={idx} style={[idx < FAQS.length - 1 && styles.borderBottom]}>
-                <Pressable
-                  onPress={() => setOpenFaq(isOpen ? null : idx)}
-                  style={styles.faqHeader}
-                >
-                  <LabelMedium style={styles.faqQuestion}>{item.q}</LabelMedium>
-                  <CaretDown
-                    size={18}
-                    color={'#8E8E93'}
-                    style={{ transform: [{ rotate: isOpen ? '180deg' : '0deg' }] }}
-                  />
-                </Pressable>
-                {isOpen && (
-                  <View style={styles.faqBody}>
-                    <BodySmall color={colors.muted}>{item.a}</BodySmall>
-                  </View>
-                )}
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <Caption style={[styles.sectionHeading, { color: colors.muted }]}>PREGUNTAS FRECUENTES</Caption>
+          <GlassCard level="hero" style={styles.card} padding={0}>
+            {FAQS.map((item, idx) => {
+              const isOpen = openFaq === idx;
+              return (
+                <View key={idx} style={[idx < FAQS.length - 1 && [styles.borderBottom, { borderBottomColor: colors.borderLight }]]}>
+                  <Pressable
+                    onPress={() => setOpenFaq(isOpen ? null : idx)}
+                    style={styles.faqHeader}
+                  >
+                    <LabelMedium style={[styles.faqQuestion, { color: colors.foreground }]}>{item.q}</LabelMedium>
+                    <CaretDown
+                      size={18}
+                      color={colors.muted}
+                      style={{ transform: [{ rotate: isOpen ? '180deg' : '0deg' }] }}
+                    />
+                  </Pressable>
+                  {isOpen && (
+                    <View style={styles.faqBody}>
+                      <BodySmall style={{ color: colors.muted }}>{item.a}</BodySmall>
+                    </View>
+                  )}
+                </View>
+              );
+            })}
+          </GlassCard>
+
+          <Caption style={[styles.sectionHeading, { color: colors.muted }]}>¿NECESITAS MÁS AYUDA?</Caption>
+          <GlassCard level="hero" style={styles.card} padding={spacing.md}>
+            <View style={styles.contactContainer}>
+              <View style={[styles.contactIconBadge, { backgroundColor: isDark ? 'rgba(10, 132, 255, 0.14)' : '#F2F2F7' }]}>
+                <ChatCircleText size={24} color={colors.primary} />
               </View>
-            );
-          })}
-        </Card>
-
-        <Caption style={styles.sectionHeading}>¿NECESITAS MÁS AYUDA?</Caption>
-        <Card style={styles.card} padding={spacing.md}>
-          <View style={styles.contactContainer}>
-            <View style={styles.contactIconBadge}>
-              <ChatCircleText size={24} color={colors.primary} />
+              <LabelMedium style={[styles.contactTitle, { color: colors.foreground }]}>Soporte técnico 24/7</LabelMedium>
+              <BodySmall style={[styles.contactDesc, { color: colors.muted }]}>
+                Nuestro equipo está disponible para resolver cualquier duda o problema.
+              </BodySmall>
+              <Button
+                title="Contactar soporte por Email"
+                onPress={handleContact}
+                variant="primary"
+                style={styles.contactButton}
+              />
             </View>
-            <LabelMedium style={styles.contactTitle}>Soporte técnico 24/7</LabelMedium>
-            <BodySmall color={colors.muted} style={styles.contactDesc}>
-              Nuestro equipo está disponible para resolver cualquier duda o problema.
-            </BodySmall>
-            <Button
-              title="Contactar soporte por Email"
-              onPress={handleContact}
-              variant="primary"
-              style={styles.contactButton}
-            />
-          </View>
-        </Card>
-      </ScrollView>
-    </SafeAreaView>
+          </GlassCard>
+        </ScrollView>
+      </SafeAreaView>
+    </MeshBackground>
   );
 }
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
   },
   header: {
     flexDirection: 'row',
@@ -111,7 +113,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    paddingHorizontal: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -125,13 +126,11 @@ const styles = StyleSheet.create({
   sectionHeading: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#8E8E93',
     marginBottom: spacing.xs,
     marginLeft: 4,
+    textTransform: 'uppercase',
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
     marginBottom: spacing.lg,
     overflow: 'hidden',
   },
@@ -152,7 +151,6 @@ const styles = StyleSheet.create({
   },
   borderBottom: {
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.06)',
   },
   contactContainer: {
     alignItems: 'center',
@@ -162,7 +160,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#F2F2F7',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.sm,

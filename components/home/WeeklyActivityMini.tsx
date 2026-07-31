@@ -1,11 +1,8 @@
-/**
- * WeeklyActivityMini — Mini gráfico de barras de actividad semanal.
- */
-
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Card, TitleSmall, Caption, LabelSmall } from '@/components/ui';
-import { colors, spacing, radius, shadows } from '@/constants/theme';
+import { View, StyleSheet, Text } from 'react-native';
+import { GlassCard, Caption, LabelSmall } from '@/components/ui';
+import { spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/useTheme';
 
 interface DayActivity {
   day: string;
@@ -18,15 +15,17 @@ interface WeeklyActivityMiniProps {
 }
 
 export function WeeklyActivityMini({ data }: WeeklyActivityMiniProps) {
+  const { colors, isDark } = useTheme();
   const maxMinutes = Math.max(...data.map(d => d.minutes), 1);
 
   return (
-    <Card variant="default">
-      <TitleSmall style={styles.title}>Actividad semanal</TitleSmall>
+    <GlassCard level="medium" style={styles.cardContainer}>
+      <Text style={[styles.sectionHeader, { color: colors.muted }]}>ACTIVIDAD SEMANAL</Text>
+
       <View style={styles.barsRow}>
         {data.map((day) => {
           const barHeight = day.minutes > 0
-            ? Math.max((day.minutes / maxMinutes) * 80, 8)
+            ? Math.max((day.minutes / maxMinutes) * 72, 10)
             : 4;
 
           return (
@@ -37,43 +36,53 @@ export function WeeklyActivityMini({ data }: WeeklyActivityMiniProps) {
                     styles.bar,
                     {
                       height: barHeight,
-                      backgroundColor: day.completed ? colors.primary : 'rgba(255, 255, 255, 0.08)',
+                      backgroundColor: day.completed
+                        ? colors.primary
+                        : isDark
+                        ? 'rgba(255, 255, 255, 0.08)'
+                        : '#E5E5EA',
                     },
-                    day.completed && shadows.glowPrimary,
                   ]}
                 />
               </View>
               <LabelSmall
                 style={[
                   styles.dayLabel,
+                  { color: day.completed ? colors.foreground : colors.muted },
                   day.completed && styles.dayLabelActive,
                 ]}
               >
                 {day.day}
               </LabelSmall>
-              {day.minutes > 0 && (
-                <Caption style={styles.minuteLabel}>{day.minutes}m</Caption>
+              {day.minutes > 0 ? (
+                <Caption style={[styles.minuteLabel, { color: colors.primary }]}>{day.minutes}m</Caption>
+              ) : (
+                <Caption style={[styles.minuteLabelMuted, { color: colors.subtle }]}>-</Caption>
               )}
             </View>
           );
         })}
       </View>
-    </Card>
+    </GlassCard>
   );
 }
 
 const styles = StyleSheet.create({
-  title: {
+  cardContainer: {
+    padding: spacing.md,
+  },
+  sectionHeader: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1.2,
     marginBottom: spacing.md,
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
+    textTransform: 'uppercase',
   },
   barsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    height: 120,
+    height: 115,
   },
   barColumn: {
     flex: 1,
@@ -82,25 +91,28 @@ const styles = StyleSheet.create({
   barContainer: {
     flex: 1,
     justifyContent: 'flex-end',
-    marginBottom: spacing.xs,
+    marginBottom: 6,
   },
   bar: {
-    width: 20,
-    borderRadius: 10,
+    width: 14,
+    borderRadius: 7,
     minHeight: 4,
   },
   dayLabel: {
-    marginTop: spacing.xs,
-    color: colors.muted,
+    marginTop: 2,
     fontSize: 11,
+    fontWeight: '600',
   },
   dayLabelActive: {
-    color: '#FFFFFF',
-    fontWeight: '700',
+    fontWeight: '800',
   },
   minuteLabel: {
-    fontSize: 9,
-    color: colors.muted,
+    fontSize: 10,
+    fontWeight: '700',
+    marginTop: 2,
+  },
+  minuteLabelMuted: {
+    fontSize: 10,
     marginTop: 2,
   },
 });

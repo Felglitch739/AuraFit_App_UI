@@ -1,39 +1,41 @@
 /**
- * Profile — Perfil de usuario, configuración y objetivos.
+ * Profile — Perfil de usuario, configuración y selección de modo (Claro / Oscuro).
  */
 
 import React from 'react';
-import { ScrollView, View, StyleSheet, Pressable } from 'react-native';
+import { ScrollView, View, StyleSheet, Pressable, Switch, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Card, TitleLarge, TitleSmall, LabelMedium, BodySmall, Button } from '@/components/ui';
-import { colors, spacing, radius } from '@/constants/theme';
-import { User, Barbell, Bell, LockKey, Question, FileText, CaretRight } from 'phosphor-react-native';
+import { spacing, radius } from '@/constants/theme';
+import { User, Barbell, Bell, LockKey, Question, FileText, CaretRight, Moon, Sun } from 'phosphor-react-native';
 import { useUserStore } from '@/store/useUserStore';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { profile } = useUserStore((state) => state);
+  const { colors, isDark, toggleThemeMode } = useTheme();
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <TitleLarge style={styles.header}>Perfil</TitleLarge>
+        <TitleLarge style={[styles.header, { color: colors.foreground }]}>Perfil</TitleLarge>
 
         {/* User Info */}
         <View style={styles.profileHeader}>
-          <View style={styles.avatar}>
-            <TitleLarge style={styles.avatarText}>
-              {(profile.name || 'A').charAt(0).toUpperCase()}
+          <View style={[styles.avatar, { backgroundColor: isDark ? '#1C1C24' : '#E5E5EA' }]}>
+            <TitleLarge style={[styles.avatarText, { color: colors.primary }]}>
+              {profile.name ? profile.name.charAt(0).toUpperCase() : 'U'}
             </TitleLarge>
           </View>
-          <View style={styles.userInfo}>
-            <TitleSmall style={{ fontWeight: '700' }}>{profile.name || 'Usuario'}</TitleSmall>
-            <BodySmall color={colors.muted}>ana@example.com</BodySmall>
+          <View style={styles.profileTextContainer}>
+            <TitleSmall style={{ fontWeight: '700', color: colors.foreground }}>{profile.name || 'Usuario'}</TitleSmall>
+            <BodySmall style={{ color: colors.muted }}>ana@example.com</BodySmall>
           </View>
         </View>
 
@@ -41,24 +43,48 @@ export default function ProfileScreen() {
         <Card style={styles.card}>
           <View style={styles.statsRow}>
             <View style={styles.statColumn}>
-              <LabelMedium style={styles.statNumber}>{profile.age || 28}</LabelMedium>
-              <BodySmall color={colors.muted}>Edad</BodySmall>
+              <LabelMedium style={[styles.statNumber, { color: colors.foreground }]}>{profile.age || 28}</LabelMedium>
+              <BodySmall style={{ color: colors.muted }}>Edad</BodySmall>
             </View>
-            <View style={styles.divider} />
+            <View style={[styles.divider, { backgroundColor: colors.borderLight }]} />
             <View style={styles.statColumn}>
-              <LabelMedium style={styles.statNumber}>{profile.weight || 62} kg</LabelMedium>
-              <BodySmall color={colors.muted}>Peso</BodySmall>
+              <LabelMedium style={[styles.statNumber, { color: colors.foreground }]}>{profile.weight || 62} kg</LabelMedium>
+              <BodySmall style={{ color: colors.muted }}>Peso</BodySmall>
             </View>
-            <View style={styles.divider} />
+            <View style={[styles.divider, { backgroundColor: colors.borderLight }]} />
             <View style={styles.statColumn}>
-              <LabelMedium style={styles.statNumber}>{profile.height || 165} cm</LabelMedium>
-              <BodySmall color={colors.muted}>Altura</BodySmall>
+              <LabelMedium style={[styles.statNumber, { color: colors.foreground }]}>{profile.height || 165} cm</LabelMedium>
+              <BodySmall style={{ color: colors.muted }}>Altura</BodySmall>
             </View>
           </View>
         </Card>
 
-        {/* Settings Links */}
+        {/* Theme Settings Section */}
         <Card style={styles.card} padding={0}>
+          <View style={[styles.settingRow, styles.settingBorder, { borderBottomColor: colors.borderLight }]}>
+            <View style={styles.settingIcon}>
+              {isDark ? (
+                <Moon size={20} color={colors.primary} weight="fill" />
+              ) : (
+                <Sun size={20} color="#FF9500" weight="fill" />
+              )}
+            </View>
+            <View style={{ flex: 1 }}>
+              <LabelMedium style={{ color: colors.foreground, fontWeight: '600' }}>
+                Modo oscuro
+              </LabelMedium>
+              <BodySmall style={{ color: colors.muted, fontSize: 11 }}>
+                {isDark ? 'Activado (Oscuro)' : 'Desactivado (Claro)'}
+              </BodySmall>
+            </View>
+            <Switch
+              value={isDark}
+              onValueChange={toggleThemeMode}
+              trackColor={{ false: '#D1D1D6', true: colors.primary }}
+              thumbColor="#FFFFFF"
+            />
+          </View>
+
           <SettingRow
             icon={<User size={20} color={colors.primary} />}
             label="Datos personales"
@@ -104,7 +130,7 @@ export default function ProfileScreen() {
           style={styles.logoutButton}
         />
 
-        <BodySmall color={colors.muted} style={styles.version}>
+        <BodySmall style={[styles.version, { color: colors.muted }]}>
           AuraFit v1.0.0
         </BodySmall>
         
@@ -125,18 +151,20 @@ function SettingRow({
   onPress?: () => void;
   hideBorder?: boolean;
 }) {
+  const { colors } = useTheme();
+
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [
         styles.settingRow,
-        !hideBorder && styles.settingBorder,
+        !hideBorder && [styles.settingBorder, { borderBottomColor: colors.borderLight }],
         pressed && { backgroundColor: 'rgba(0,0,0,0.03)' },
       ]}
     >
       <View style={styles.settingIcon}>{icon}</View>
-      <LabelMedium style={styles.settingLabel}>{label}</LabelMedium>
-      <CaretRight size={20} color={'#C7C7CC'} />
+      <LabelMedium style={[styles.settingLabel, { color: colors.foreground }]}>{label}</LabelMedium>
+      <CaretRight size={20} color={colors.muted} />
     </Pressable>
   );
 }
@@ -144,7 +172,6 @@ function SettingRow({
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   container: {
     flex: 1,
@@ -155,6 +182,8 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: spacing.lg,
+    fontSize: 28,
+    fontWeight: '800',
   },
   profileHeader: {
     flexDirection: 'row',
@@ -162,18 +191,18 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   avatar: {
-    width: 64,
-    height: 64,
+    width: 60,
+    height: 60,
     borderRadius: radius.full,
-    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
   },
   avatarText: {
-    color: colors.onPrimary,
+    fontSize: 24,
+    fontWeight: '700',
   },
-  userInfo: {
+  profileTextContainer: {
     flex: 1,
   },
   card: {
@@ -187,10 +216,13 @@ const styles = StyleSheet.create({
   statColumn: {
     alignItems: 'center',
   },
+  statNumber: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
   divider: {
     width: 1,
     height: 30,
-    backgroundColor: colors.borderLight,
   },
   settingRow: {
     flexDirection: 'row',
@@ -199,7 +231,6 @@ const styles = StyleSheet.create({
   },
   settingBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
   },
   settingIcon: {
     width: 32,
@@ -210,7 +241,6 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     marginTop: spacing.md,
-    borderColor: colors.destructive,
   },
   version: {
     textAlign: 'center',
