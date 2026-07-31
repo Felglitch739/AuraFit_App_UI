@@ -6,7 +6,8 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { colors, radius, spacing, shadows } from '@/constants/theme';
+import { radius, spacing, shadows } from '@/constants/theme';
+import { useTheme } from '@/hooks/useTheme';
 import type { CardVariant } from './Card';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -28,6 +29,7 @@ export function PressableCard({
   style,
   disabled = false,
 }: PressableCardProps) {
+  const { colors } = useTheme();
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -67,6 +69,10 @@ export function PressableCard({
       disabled={disabled}
       style={[
         styles.base,
+        {
+          backgroundColor: colors.surface,
+          borderColor: colors.borderLight,
+        },
         shadowStyle,
         { padding },
         animatedStyle,
@@ -80,9 +86,7 @@ export function PressableCard({
 
 const styles = StyleSheet.create({
   base: {
-    backgroundColor: colors.surface,
     borderRadius: radius.lg,
-    borderColor: colors.borderLight,
     borderWidth: 1,
   },
 });

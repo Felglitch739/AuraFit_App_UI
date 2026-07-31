@@ -1,8 +1,3 @@
-/**
- * Button — Pressable con feedback visual (opacity + scale sutil).
- * Cumple touch target mínimo de 44×44pt.
- */
-
 import React, { useCallback } from 'react';
 import {
   Pressable,
@@ -17,7 +12,8 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import { colors, radius, spacing, typography, animation, touchTargets } from '@/constants/theme';
+import { radius, spacing, typography, animation, touchTargets } from '@/constants/theme';
+import { useTheme } from '@/hooks/useTheme';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -27,6 +23,7 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
 interface ButtonProps {
   title?: string;
   children?: React.ReactNode;
+  icon?: React.ReactNode;
   onPress: () => void;
   variant?: ButtonVariant;
   size?: ButtonSize;
@@ -39,6 +36,7 @@ interface ButtonProps {
 export function Button({
   title,
   children,
+  icon,
   onPress,
   variant = 'primary',
   size = 'md',
@@ -47,6 +45,7 @@ export function Button({
   style,
   accessibilityLabel,
 }: ButtonProps) {
+  const { colors } = useTheme();
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
 
@@ -65,8 +64,8 @@ export function Button({
     opacity.value = withTiming(1, { duration: animation.fast });
   }, [scale, opacity]);
 
-  const buttonStyle = getButtonStyle(variant, size, disabled);
-  const textStyle = getTextStyle(variant, size, disabled);
+  const buttonStyle = getButtonStyle(variant, size, disabled, colors);
+  const textStyle = getTextStyle(variant, size, disabled, colors);
 
   return (
     <AnimatedPressable
@@ -87,13 +86,16 @@ export function Button({
       ) : children ? (
         children
       ) : (
-        <Text style={textStyle}>{title}</Text>
+        <Animated.View style={styles.contentRow}>
+          {icon}
+          {title && <Text style={textStyle}>{title}</Text>}
+        </Animated.View>
       )}
     </AnimatedPressable>
   );
 }
 
-function getButtonStyle(variant: ButtonVariant, size: ButtonSize, disabled: boolean): ViewStyle {
+function getButtonStyle(variant: ButtonVariant, size: ButtonSize, disabled: boolean, colors: any): ViewStyle {
   const base: ViewStyle = {
     alignItems: 'center',
     justifyContent: 'center',
@@ -113,7 +115,7 @@ function getButtonStyle(variant: ButtonVariant, size: ButtonSize, disabled: bool
     case 'primary':
       return { ...base, backgroundColor: colors.primary };
     case 'secondary':
-      return { ...base, backgroundColor: colors.secondary };
+      return { ...base, backgroundColor: colors.surface };
     case 'outline':
       return { ...base, backgroundColor: 'transparent', borderWidth: 1.5, borderColor: colors.primary };
     case 'ghost':
@@ -121,7 +123,7 @@ function getButtonStyle(variant: ButtonVariant, size: ButtonSize, disabled: bool
   }
 }
 
-function getTextStyle(variant: ButtonVariant, size: ButtonSize, disabled: boolean) {
+function getTextStyle(variant: ButtonVariant, size: ButtonSize, disabled: boolean, colors: any) {
   const base = {
     ...typography.labelLarge,
     ...(size === 'sm' ? typography.labelMedium : {}),
@@ -153,3 +155,12 @@ function getSizeStyle(size: ButtonSize): ViewStyle {
       return { paddingHorizontal: spacing.lg, paddingVertical: spacing.sm + 4 };
   }
 }
+
+const styles = StyleSheet.create({
+  contentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+});

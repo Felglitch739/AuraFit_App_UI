@@ -1,10 +1,11 @@
-/**
- * Chip — Tag redondeado seleccionable (para filtros, muscle groups, etc.)
- */
+import React from 'react';
+import { Pressable, Text, StyleSheet, Platform, type ViewStyle, type StyleProp } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
+import { radius, spacing, typography, touchTargets } from '@/constants/theme';
+import { useTheme } from '@/hooks/useTheme';
 
-import React, { useCallback } from 'react';
-import { Pressable, Text, StyleSheet, type ViewStyle, type StyleProp } from 'react-native';
-import { colors, radius, spacing, typography, touchTargets } from '@/constants/theme';
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface ChipProps {
   label: string;
@@ -14,47 +15,85 @@ interface ChipProps {
 }
 
 export function Chip({ label, selected = false, onPress, style }: ChipProps) {
+  const { colors, isDark } = useTheme();
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.94, { damping: 16, stiffness: 300 });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, { damping: 16, stiffness: 300 });
+  };
+
+  const handlePress = () => {
+    if (onPress) {
+      if (Platform.OS !== 'web') {
+        try {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        } catch (_) {}
+      }
+      onPress();
+    }
+  };
+
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
+    <AnimatedPressable
+      onPress={handlePress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={[
         styles.chip,
-        selected && styles.chipSelected,
-        pressed && styles.chipPressed,
+        {
+          backgroundColor: selected
+            ? colors.primary
+            : isDark
+            ? 'rgba(255, 255, 255, 0.06)'
+            : '#E5E5EA',
+          borderColor: selected
+            ? colors.primary
+            : isDark
+            ? 'rgba(255, 255, 255, 0.12)'
+            : '#D1D1D6',
+        },
+        animatedStyle,
         style,
       ]}
       accessibilityRole="button"
       accessibilityState={{ selected }}
       accessibilityLabel={label}
     >
-      <Text style={[styles.label, selected && styles.labelSelected]}>
+      <Text
+        style={[
+          styles.label,
+          {
+            color: selected ? colors.onPrimary : colors.foreground,
+            fontWeight: selected ? '700' : '600',
+          },
+        ]}
+      >
         {label}
       </Text>
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
 const styles = StyleSheet.create({
   chip: {
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.xs + 2,
     borderRadius: radius.xl,
-    backgroundColor: colors.surface,
-    minHeight: touchTargets.minimum,
+    borderWidth: 1,
+    minHeight: touchTargets.minimum - 6,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  chipSelected: {
-    backgroundColor: colors.primary,
-  },
-  chipPressed: {
-    opacity: 0.8,
-  },
   label: {
     ...typography.labelMedium,
-    color: colors.foreground,
-  },
-  labelSelected: {
-    color: colors.onPrimary,
+    fontSize: 13,
   },
 });

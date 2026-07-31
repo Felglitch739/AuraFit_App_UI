@@ -4,6 +4,7 @@ import { BlurView } from 'expo-blur';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { radius, spacing } from '@/constants/theme';
+import { useUserStore } from '@/store/useUserStore';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -25,6 +26,8 @@ export function GlassCard({
   style,
   ...props
 }: GlassCardProps) {
+  const themeMode = useUserStore((state) => state.themeMode);
+  const isDark = themeMode === 'dark';
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -33,7 +36,6 @@ export function GlassCard({
 
   const handlePressIn = () => {
     if (onPress) {
-      // Apple Design: Critically-damped spring (smooth, no overshoot)
       scale.value = withSpring(0.98, { damping: 18, stiffness: 220 });
     }
   };
@@ -61,33 +63,55 @@ export function GlassCard({
     subtle: Platform.OS === 'ios' ? 20 : 40,
   };
 
-  const bgMap = {
-    hero: 'rgba(255, 255, 255, 0.06)',
-    medium: 'rgba(255, 255, 255, 0.04)',
-    subtle: 'rgba(255, 255, 255, 0.02)',
+  const bgMapDark = {
+    hero: '#14141A',
+    medium: '#14141A',
+    subtle: 'rgba(255, 255, 255, 0.03)',
   };
 
-  const borderMap = {
-    hero: 'rgba(255, 255, 255, 0.18)',
-    medium: 'rgba(255, 255, 255, 0.12)',
-    subtle: 'rgba(255, 255, 255, 0.07)',
+  const bgMapLight = {
+    hero: '#FFFFFF',
+    medium: '#FFFFFF',
+    subtle: 'rgba(0, 0, 0, 0.02)',
+  };
+
+  const borderMapDark = {
+    hero: 'rgba(255, 255, 255, 0.14)',
+    medium: 'rgba(255, 255, 255, 0.10)',
+    subtle: 'rgba(255, 255, 255, 0.06)',
+  };
+
+  const borderMapLight = {
+    hero: '#E5E5EA',
+    medium: '#E5E5EA',
+    subtle: '#E5E5EA',
   };
 
   const glowStyle: ViewStyle = glowColor
     ? {
         shadowColor: glowColor,
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.22,
+        shadowOpacity: isDark ? 0.25 : 0.12,
         shadowRadius: 8,
         elevation: 4,
       }
-    : {};
+    : isDark ? {} : {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 6,
+        elevation: 2,
+      };
+
+  // Check if flex: 1 is in style
+  const flattenedStyle = StyleSheet.flatten(style) || {};
+  const outerFlexStyle: ViewStyle = flattenedStyle.flex !== undefined ? { flex: flattenedStyle.flex } : {};
 
   const cardStyle = [
     styles.cardContent,
     {
-      backgroundColor: bgMap[level],
-      borderColor: borderMap[level],
+      backgroundColor: isDark ? bgMapDark[level] : bgMapLight[level],
+      borderColor: isDark ? borderMapDark[level] : borderMapLight[level],
       padding,
     },
     style,
@@ -100,7 +124,7 @@ export function GlassCard({
   ) : (
     <BlurView
       intensity={intensityMap[level]}
-      tint="dark"
+      tint={isDark ? "dark" : "light"}
       experimentalBlurMethod="dimezisBlurView"
       style={[styles.blurContainer, cardStyle]}
       {...props}
@@ -115,14 +139,14 @@ export function GlassCard({
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         onPress={handlePress}
-        style={[styles.outerContainer, glowStyle, animatedStyle]}
+        style={[styles.outerContainer, outerFlexStyle, glowStyle, animatedStyle]}
       >
         {innerComponent}
       </AnimatedPressable>
     );
   }
 
-  return <View style={[styles.outerContainer, glowStyle]}>{innerComponent}</View>;
+  return <View style={[styles.outerContainer, outerFlexStyle, glowStyle]}>{innerComponent}</View>;
 }
 
 const styles = StyleSheet.create({
@@ -133,16 +157,16 @@ const styles = StyleSheet.create({
   blurContainer: {
     borderRadius: radius.lg,
     overflow: 'hidden',
+    flex: 1,
   },
   webGlass: {
     borderRadius: radius.lg,
     overflow: 'hidden',
-    // @ts-ignore Web blur filter support
-    backdropFilter: 'blur(24px)',
+    flex: 1,
   },
   cardContent: {
     borderWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.22)',
     borderRadius: radius.lg,
+    flex: 1,
   },
 });
