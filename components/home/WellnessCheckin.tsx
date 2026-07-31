@@ -20,7 +20,7 @@ export function WellnessCheckin({ checkin, onPress }: WellnessCheckinProps) {
   if (!checkin) {
     return (
       <PressableCard variant="default" onPress={onPress}>
-        <TitleSmall style={{ fontWeight: '700' }}>Check-in de bienestar</TitleSmall>
+        <TitleSmall style={{ fontWeight: '700', color: '#FFFFFF' }}>Check-in de bienestar</TitleSmall>
         <BodySmall color={colors.muted} style={styles.cta}>
           Toca para registrar cómo te sentís hoy
         </BodySmall>
@@ -33,17 +33,17 @@ export function WellnessCheckin({ checkin, onPress }: WellnessCheckinProps) {
       <TitleSmall style={styles.title}>Bienestar hoy</TitleSmall>
       <View style={styles.metricsRow}>
         <WellnessMetric
-          icon={<Lightning size={24} color={'#FF9500'} weight="fill" />}
+          icon={<Lightning size={22} color={'#FF9F0A'} weight="fill" />}
           label="Energía"
           value={`${checkin.energy}/5`}
         />
         <WellnessMetric
-          icon={<Moon size={24} color={'#5856D6'} weight="fill" />}
+          icon={<Moon size={22} color={'#5E5CE6'} weight="fill" />}
           label="Sueño"
           value={`${checkin.sleepHours}h`}
         />
         <WellnessMetric
-          icon={<Brain size={24} color={'#007AFF'} weight="fill" />}
+          icon={<Brain size={22} color={'#0A84FF'} weight="fill" />}
           label="Estrés"
           value={`${checkin.stress}/5`}
         />
@@ -61,17 +61,17 @@ export function WellnessCheckin({ checkin, onPress }: WellnessCheckinProps) {
 function getMoodIcon(mood: MoodType) {
   switch (mood) {
     case 'excellent':
-      return <Star size={24} color={colors.energyHigh} weight="fill" />;
+      return <Star size={22} color="#FFD60A" weight="fill" />;
     case 'good':
-      return <Smiley size={24} color={colors.success} weight="fill" />;
+      return <Smiley size={22} color="#30D158" weight="fill" />;
     case 'neutral':
-      return <SmileyMeh size={24} color={colors.muted} weight="fill" />;
+      return <SmileyMeh size={22} color="#8E8E93" weight="fill" />;
     case 'sad':
-      return <SmileySad size={24} color={colors.fats} weight="fill" />;
+      return <SmileySad size={22} color="#FF9F0A" weight="fill" />;
     case 'stressed':
-      return <WarningCircle size={24} color={colors.destructive} weight="fill" />;
+      return <WarningCircle size={22} color="#FF453A" weight="fill" />;
     default:
-      return <Smiley size={24} color={colors.muted} weight="fill" />;
+      return <Smiley size={22} color="#8E8E93" weight="fill" />;
   }
 }
 
@@ -91,8 +91,8 @@ function WellnessMetric({
       <View style={styles.metricIcon}>
         {icon}
       </View>
-      <Caption>{label}</Caption>
-      {!isIconOnly && <LabelMedium>{value}</LabelMedium>}
+      <Caption color={colors.muted}>{label}</Caption>
+      {!isIconOnly && <LabelMedium style={styles.metricValue}>{value}</LabelMedium>}
     </View>
   );
 }
@@ -100,6 +100,9 @@ function WellnessMetric({
 const styles = StyleSheet.create({
   title: {
     marginBottom: spacing.md,
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
   cta: {
     marginTop: spacing.xs,
@@ -110,14 +113,19 @@ const styles = StyleSheet.create({
   },
   metric: {
     alignItems: 'center',
-    gap: spacing.xs,
+    gap: 4,
   },
   metricIcon: {
     width: 40,
     height: 40,
-    borderRadius: radius.full,
-    backgroundColor: colors.surface,
+    borderRadius: 20,
+    backgroundColor: '#1C1C24',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  metricValue: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 13,
   },
 });

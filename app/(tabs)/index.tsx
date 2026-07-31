@@ -55,7 +55,7 @@ export default function HomeScreen() {
       >
         {/* Header — Saludo + Fecha */}
         <View style={styles.header}>
-          <TitleLarge>Hola, {profile.name || 'User'}</TitleLarge>
+          <TitleLarge style={styles.greetingTitle}>Hola, {profile.name || 'User'}</TitleLarge>
           <BodyMedium color={colors.muted} style={styles.dateText}>
             {dateStr.charAt(0).toUpperCase() + dateStr.slice(1)}
           </BodyMedium>
@@ -120,6 +120,12 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: spacing.lg,
+  },
+  greetingTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: -0.5,
   },
   dateText: {
     marginTop: spacing.xs,

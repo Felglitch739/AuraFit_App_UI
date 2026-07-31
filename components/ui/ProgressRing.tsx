@@ -34,7 +34,7 @@ export function ProgressRing({
   strokeWidth = 8,
   color = colors.primary,
   gradientColors,
-  trackColor = '#E5E5EA',
+  trackColor = colors.borderLight,
   children,
 }: ProgressRingProps) {
   const gradientId = useId();

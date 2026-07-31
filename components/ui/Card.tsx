@@ -69,10 +69,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     borderColor: colors.borderLight,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: 1,
   },
   elevated: {
-    borderColor: 'transparent',
-    borderWidth: 0,
+    borderColor: colors.border,
+    borderWidth: 1,
   },
 });

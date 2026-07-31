@@ -31,12 +31,12 @@ export function CalorieSummary({
       <TitleSmall style={styles.title}>Calorías de hoy</TitleSmall>
 
       <View style={styles.mainRow}>
-        {/* Anillo principal de calorías con gradiente Apple */}
+        {/* Anillo principal de calorías con gradiente Electric Dark */}
         <ProgressRing
           progress={calorieProgress}
           size={140}
           strokeWidth={14}
-          gradientColors={['#007AFF', '#5856D6']}
+          gradientColors={['#0A84FF', '#5E5CE6']}
         >
           <DisplayMedium style={styles.calorieNumber}>
             {consumed.toLocaleString()}
@@ -50,21 +50,21 @@ export function CalorieSummary({
             label="Proteína"
             current={protein.current}
             target={protein.target}
-            gradientColors={['#FF2D55', '#FF3B30']}
+            gradientColors={['#FF375F', '#FF453A']}
             unit="g"
           />
           <MacroRing
             label="Carbos"
             current={carbs.current}
             target={carbs.target}
-            gradientColors={['#FF9500', '#FFCC00']}
+            gradientColors={['#FFD60A', '#FF9F0A']}
             unit="g"
           />
           <MacroRing
             label="Grasas"
             current={fats.current}
             target={fats.target}
-            gradientColors={['#34C759', '#30B0C7']}
+            gradientColors={['#30D158', '#64D2FF']}
             unit="g"
           />
         </View>
@@ -102,7 +102,7 @@ function MacroRing({
         strokeWidth={5}
         gradientColors={gradientColors}
       >
-        <Caption style={{ fontSize: 9, fontWeight: '700' }}>{Math.round(current)}</Caption>
+        <Caption style={{ fontSize: 9, fontWeight: '800', color: '#FFFFFF' }}>{Math.round(current)}</Caption>
       </ProgressRing>
       <View style={styles.macroTextColumn}>
         <Caption color={colors.muted}>{label}</Caption>
@@ -119,6 +119,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     fontSize: 16,
     fontWeight: '700',
+    color: '#FFFFFF',
   },
   mainRow: {
     flexDirection: 'row',
@@ -142,11 +143,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     letterSpacing: -0.3,
+    color: '#FFFFFF',
   },
   calorieNumber: {
     fontSize: 30,
     fontWeight: '800',
     letterSpacing: -0.8,
+    color: '#FFFFFF',
   },
   targetCaption: {
     fontSize: 11,
@@ -158,8 +161,8 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   boldRemaining: {
-    fontWeight: '700',
-    color: colors.text,
+    fontWeight: '800',
+    color: '#FFFFFF',
   },
 });
 

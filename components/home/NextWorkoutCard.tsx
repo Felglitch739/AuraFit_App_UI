@@ -22,10 +22,10 @@ export function NextWorkoutCard({ workout, onStart }: NextWorkoutCardProps) {
     <PressableCard variant="elevated" onPress={onStart || (() => {})}>
       <View style={styles.header}>
         <View style={styles.iconContainer}>
-          <Barbell size={24} color={colors.primary} />
+          <Barbell size={22} color={colors.primary} />
         </View>
         <View style={styles.headerText}>
-          <TitleSmall style={{ fontWeight: '700' }}>{workout.name}</TitleSmall>
+          <TitleSmall style={styles.titleText}>{workout.name}</TitleSmall>
           <BodySmall color={colors.muted}>
             {exerciseCount} ejercicios · {totalSets} series
           </BodySmall>
@@ -38,7 +38,7 @@ export function NextWorkoutCard({ workout, onStart }: NextWorkoutCardProps) {
           <View key={ex.exercise.id} style={styles.exerciseRow}>
             <Caption style={styles.exerciseNumber}>{index + 1}</Caption>
             <LabelMedium style={styles.exerciseName}>{ex.exercise.name}</LabelMedium>
-            <Caption style={{ fontWeight: '600' }}>{ex.sets.length}×{ex.sets[0]?.reps}</Caption>
+            <Caption style={styles.exerciseReps}>{ex.sets.length}×{ex.sets[0]?.reps}</Caption>
           </View>
         ))}
       </View>
@@ -48,7 +48,7 @@ export function NextWorkoutCard({ workout, onStart }: NextWorkoutCardProps) {
         onPress={onStart || (() => {})}
         variant="primary"
         size="md"
-        style={styles.startButton}
+        style={[styles.startButton, shadows.glowPrimary]}
         accessibilityLabel="Iniciar entrenamiento"
       />
     </PressableCard>
@@ -62,16 +62,22 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   iconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    backgroundColor: '#1C1C24',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.sm,
   },
   headerText: {
     flex: 1,
+  },
+  titleText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 2,
   },
   exerciseList: {
     marginBottom: spacing.md,
@@ -90,6 +96,12 @@ const styles = StyleSheet.create({
   exerciseName: {
     flex: 1,
     fontSize: 13,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  exerciseReps: {
+    fontWeight: '600',
+    color: colors.muted,
   },
   startButton: {
     marginTop: spacing.xs,

@@ -37,8 +37,9 @@ export function WeeklyActivityMini({ data }: WeeklyActivityMiniProps) {
                     styles.bar,
                     {
                       height: barHeight,
-                      backgroundColor: day.completed ? colors.primary : colors.borderLight,
+                      backgroundColor: day.completed ? colors.primary : 'rgba(255, 255, 255, 0.08)',
                     },
+                    day.completed && shadows.glowPrimary,
                   ]}
                 />
               </View>
@@ -64,6 +65,9 @@ export function WeeklyActivityMini({ data }: WeeklyActivityMiniProps) {
 const styles = StyleSheet.create({
   title: {
     marginBottom: spacing.md,
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
   barsRow: {
     flexDirection: 'row',
@@ -81,8 +85,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   bar: {
-    width: 24,
-    borderRadius: radius.sm,
+    width: 20,
+    borderRadius: 10,
     minHeight: 4,
   },
   dayLabel: {
@@ -91,7 +95,8 @@ const styles = StyleSheet.create({
     fontSize: 11,
   },
   dayLabelActive: {
-    color: colors.primary,
+    color: '#FFFFFF',
+    fontWeight: '700',
   },
   minuteLabel: {
     fontSize: 9,

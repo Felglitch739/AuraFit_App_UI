@@ -14,48 +14,93 @@
 import { Platform, type ViewStyle } from 'react-native';
 
 // ─── COLORS ────────────────────────────────────────────────────
-export const colors = {
-  // Core (Apple HIG)
+export const lightColors = {
   primary: '#007AFF',       // iOS System Blue
   onPrimary: '#FFFFFF',     // Blanco puro para contraste
   secondary: '#5AC8FA',     // iOS Light Blue para acentos secundarios
   accent: '#34C759',        // iOS System Green para CTA / éxitos
 
-  // Surfaces
   background: '#F2F2F7',    // Fondo general (iOS System Grouped Background)
   surface: '#FFFFFF',       // Cards (Blanco puro)
   surfaceElevated: '#FFFFFF', 
 
-  // Text
   foreground: '#000000',    // Texto principal (iOS Black)
   muted: '#8E8E93',         // Texto secundario (iOS System Gray)
   subtle: '#C7C7CC',        // Texto terciario / disabled
 
-  // Borders
   border: '#C6C6C8',        // Bordes (iOS Separator)
   borderLight: '#E5E5EA',   // Bordes sutiles (iOS Opaque Separator)
 
-  // Feedback
   destructive: '#FF3B30',   // iOS System Red
   warning: '#FF9500',       // iOS System Orange
   success: '#34C759',       // iOS System Green
 
-  // Macro colors (para anillos de nutrición)
   protein: '#FF3B30',       // Rojo
   carbs: '#FFCC00',         // Amarillo iOS
   fats: '#007AFF',          // Azul iOS
 
-  // Wellness
   energyHigh: '#FF9500',
   energyLow: '#8E8E93',
   sleepGood: '#5856D6',     // iOS Purple/Indigo
   stressLow: '#34C759',
   stressHigh: '#FF3B30',
 
-  // Tab bar
+  glowPrimary: 'rgba(0, 122, 255, 0.4)',
+  glowAccent: 'rgba(52, 199, 89, 0.4)',
+
   tabIconDefault: '#8E8E93',
   tabIconSelected: '#007AFF',
 } as const;
+
+export const darkColors = {
+  // Core (Oura / Whoop / Linear inspired)
+  primary: '#0A84FF',       // Neon Electric Blue
+  onPrimary: '#FFFFFF',     // Pure White
+  secondary: '#5E5CE6',     // Electric Indigo
+  accent: '#30D158',        // Neon Green
+
+  // Glow Colors
+  glowPrimary: '#0A84FF',
+  glowAccent: '#30D158',
+
+  // Surfaces (Cold near-pure black & dark solid cards)
+  background: '#0A0A0F',    // Deep cold black
+  surface: '#14141A',       // Solid dark card surface
+  surfaceElevated: '#1C1C24', 
+
+  // Text Hierarchy
+  foreground: '#FFFFFF',    // Primary text / Big numbers (Pure White)
+  muted: '#8E8E93',         // Secondary text / Labels (iOS System Gray)
+  subtle: '#48484A',        // Tertiary text / disabled
+
+  // Borders (Crisp 1px subtle white outlines)
+  border: 'rgba(255, 255, 255, 0.12)',
+  borderLight: 'rgba(255, 255, 255, 0.08)',
+
+  // Feedback
+  destructive: '#FF453A',   // System Red Dark
+  warning: '#FF9F0A',       // System Orange Dark
+  success: '#30D158',       // System Green Dark
+
+  // High-contrast Macro colors for dark mode
+  protein: '#FF375F',       // Neon Pink/Red
+  carbs: '#FFD60A',         // Vibrant Amber
+  fats: '#30D158',          // Neon Green
+
+  // Wellness
+  energyHigh: '#FF9F0A',
+  energyLow: '#8E8E93',
+  sleepGood: '#5E5CE6',
+  stressLow: '#30D158',
+  stressHigh: '#FF453A',
+
+  // Tab bar
+  tabIconDefault: '#8E8E93',
+  tabIconSelected: '#FFFFFF',
+} as const;
+
+// Active Theme Palette for feature/ui-experiments branch
+export const colors = darkColors;
 
 // ─── SPACING (8dp rhythm) ──────────────────────────────────────
 export const spacing = {
@@ -155,16 +200,16 @@ export const typography = {
 // extremadamente finos o sombras casi nulas.
 
 export const shadows = {
-  /** Sombra/borde flat para cards iOS */
+  /** Sombra sutil / borde para cards en dark mode */
   card: Platform.select<ViewStyle>({
     ios: {
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.04,
-      shadowRadius: 2,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
     },
     android: {
-      elevation: 1,
+      elevation: 2,
     },
     default: {},
   }) as ViewStyle,
@@ -173,12 +218,40 @@ export const shadows = {
   cardElevated: Platform.select<ViewStyle>({
     ios: {
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.1,
-      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.5,
+      shadowRadius: 16,
     },
     android: {
       elevation: 6,
+    },
+    default: {},
+  }) as ViewStyle,
+
+  /** GLOW Eléctrico Azul para anillo / CTA principal */
+  glowPrimary: Platform.select<ViewStyle>({
+    ios: {
+      shadowColor: '#0A84FF',
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.55,
+      shadowRadius: 12,
+    },
+    android: {
+      elevation: 8,
+    },
+    default: {},
+  }) as ViewStyle,
+
+  /** GLOW Neón Verde para éxitos / acentos */
+  glowAccent: Platform.select<ViewStyle>({
+    ios: {
+      shadowColor: '#30D158',
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.55,
+      shadowRadius: 12,
+    },
+    android: {
+      elevation: 8,
     },
     default: {},
   }) as ViewStyle,

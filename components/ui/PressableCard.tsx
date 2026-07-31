@@ -80,9 +80,9 @@ export function PressableCard({
 
 const styles = StyleSheet.create({
   base: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: radius.lg,
     borderColor: colors.borderLight,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: 1,
   },
 });
