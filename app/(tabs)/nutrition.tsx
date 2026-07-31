@@ -1,13 +1,9 @@
-/**
- * Nutrition — Registro de comidas + resumen de macros diarios + escáner con foto.
- */
-
 import React from 'react';
 import { ScrollView, View, StyleSheet, Pressable, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   MeshBackground, GlassCard, TitleLarge, TitleSmall, LabelMedium,
-  BodySmall, Caption, ProgressRing, Button,
+  BodySmall, Caption, ProgressRing,
 } from '@/components/ui';
 import { spacing, radius } from '@/constants/theme';
 import { Sun, ForkKnife, Moon, Coffee, Plus, Camera, Sparkle } from 'phosphor-react-native';
@@ -89,9 +85,10 @@ export default function NutritionScreen() {
             </View>
           </GlassCard>
 
-          {/* AI Camera Meal Scanner — Reordenado arriba de Comidas de hoy */}
+          {/* AI Camera Meal Scanner — Tarjeta unificada interactiva sin botón sobrante abajo */}
           <GlassCard
             level="hero"
+            onPress={() => {}}
             style={[
               styles.cameraCard,
               {
@@ -116,18 +113,12 @@ export default function NutritionScreen() {
                   <Text style={[styles.aiBadgeText, { color: colors.primary }]}>RECONOCIMIENTO IA</Text>
                 </View>
                 <Text style={[styles.cameraTitle, { color: colors.foreground }]}>Analizar comida con foto</Text>
-                <Caption style={{ color: colors.muted }}>Saca una foto a tu plato para calcular macros</Caption>
+                <Caption style={{ color: colors.muted }}>Toca para escanear plato y calcular macros</Caption>
+              </View>
+              <View style={[styles.cameraActionBadge, { backgroundColor: colors.primary }]}>
+                <Camera size={18} color={colors.onPrimary} weight="fill" />
               </View>
             </View>
-            <Button
-              title="Tomar o subir foto"
-              onPress={() => {}}
-              variant="primary"
-              size="md"
-              icon={<Camera size={16} color={colors.onPrimary} weight="fill" />}
-              style={styles.cameraButton}
-              accessibilityLabel="Tomar foto de comida para análisis con IA"
-            />
           </GlassCard>
 
           {/* Meals */}
@@ -137,7 +128,7 @@ export default function NutritionScreen() {
             const meal = nutrition.meals.find(m => m.type === mealType);
 
             return (
-              <GlassCard key={mealType} level="medium" style={styles.mealCard}>
+              <GlassCard key={mealType} level="medium" style={styles.mealCard} onPress={() => {}}>
                 <View style={styles.mealHeader}>
                   <View style={[styles.mealIconContainer, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F2F2F7' }]}>
                     {React.createElement(MEAL_TYPE_ICONS[mealType], {
@@ -283,7 +274,6 @@ const styles = StyleSheet.create({
   cameraRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.md,
   },
   cameraIconContainer: {
     width: 44,
@@ -295,6 +285,7 @@ const styles = StyleSheet.create({
   },
   cameraTextCol: {
     flex: 1,
+    paddingRight: spacing.xs,
   },
   aiBadgeRow: {
     flexDirection: 'row',
@@ -311,11 +302,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '800',
   },
-  cameraButton: {
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 4,
+  cameraActionBadge: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: spacing.xs,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
   },
   sectionTitle: {
     fontSize: 18,
