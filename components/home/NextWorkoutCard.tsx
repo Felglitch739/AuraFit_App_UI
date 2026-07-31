@@ -5,7 +5,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { PressableCard, TitleSmall, LabelMedium, BodySmall, Caption, Button } from '@/components/ui';
-import { colors, spacing, radius } from '@/constants/theme';
+import { colors, spacing, radius, shadows } from '@/constants/theme';
 import { Barbell } from 'phosphor-react-native';
 import type { Workout } from '@/types';
 

@@ -5,7 +5,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Card, TitleSmall, Caption, LabelSmall } from '@/components/ui';
-import { colors, spacing, radius } from '@/constants/theme';
+import { colors, spacing, radius, shadows } from '@/constants/theme';
 
 interface DayActivity {
   day: string;

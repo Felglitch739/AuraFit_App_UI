@@ -1,5 +1,6 @@
 export { Card, type CardVariant } from './Card';
 export { PressableCard } from './PressableCard';
+export { GlassCard, type GlassCardProps } from './GlassCard';
 export { Button, type ButtonVariant, type ButtonSize } from './Button';
 export { ProgressRing } from './ProgressRing';
 export { Input } from './Input';

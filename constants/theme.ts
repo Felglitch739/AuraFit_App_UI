@@ -228,30 +228,30 @@ export const shadows = {
     default: {},
   }) as ViewStyle,
 
-  /** GLOW Eléctrico Azul para anillo / CTA principal */
+  /** GLOW Eléctrico Azul sutil para anillo / CTA principal */
   glowPrimary: Platform.select<ViewStyle>({
     ios: {
       shadowColor: '#0A84FF',
-      shadowOffset: { width: 0, height: 0 },
-      shadowOpacity: 0.55,
-      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.22,
+      shadowRadius: 8,
     },
     android: {
-      elevation: 8,
+      elevation: 3,
     },
     default: {},
   }) as ViewStyle,
 
-  /** GLOW Neón Verde para éxitos / acentos */
+  /** GLOW Neón Verde sutil */
   glowAccent: Platform.select<ViewStyle>({
     ios: {
       shadowColor: '#30D158',
-      shadowOffset: { width: 0, height: 0 },
-      shadowOpacity: 0.55,
-      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.22,
+      shadowRadius: 8,
     },
     android: {
-      elevation: 8,
+      elevation: 3,
     },
     default: {},
   }) as ViewStyle,

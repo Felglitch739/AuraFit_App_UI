@@ -1,17 +1,20 @@
 /**
- * Progress — Gráficas de peso, historial de entrenamientos, tendencias.
+ * Progress — VisionOS-style Glassmorphism & Apple Design Spatial Minimalist.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ScrollView, View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Card, TitleLarge, TitleSmall, LabelMedium, BodySmall, Caption } from '@/components/ui';
-import { colors, spacing, radius } from '@/constants/theme';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { GlassCard, TitleLarge, TitleSmall, LabelMedium, BodySmall, Caption } from '@/components/ui';
+import { colors, spacing } from '@/constants/theme';
 import { mockWeightHistory, mockWellnessHistory } from '@/data/mock';
-import { Lightning, Moon, Brain, Smiley, SmileyMeh, SmileySad, Star, WarningCircle, Fire, Trophy, Clock } from 'phosphor-react-native';
+import { Lightning, Moon, Brain, Smiley, SmileyMeh, SmileySad, Star, WarningCircle, Fire, Trophy, Clock, CaretDown } from 'phosphor-react-native';
 import type { MoodType } from '@/types';
 
 export default function ProgressScreen() {
+  const [expandedWellnessId, setExpandedWellnessId] = useState<string | null>(null);
+
   const latestWeight = mockWeightHistory[mockWeightHistory.length - 1];
   const firstWeight = mockWeightHistory[0];
   const weightChange = latestWeight.weight - firstWeight.weight;
@@ -23,123 +26,157 @@ export default function ProgressScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <TitleLarge style={styles.pageTitle}>Progreso</TitleLarge>
-        <BodySmall color={colors.muted} style={styles.subtitle}>
-          Tu evolución a lo largo del tiempo
-        </BodySmall>
+        <Animated.View entering={FadeInDown.duration(300)}>
+          <TitleLarge style={styles.pageTitle}>Progreso</TitleLarge>
+          <BodySmall color={colors.muted} style={styles.subtitle}>
+            Tu evolución a lo largo del tiempo
+          </BodySmall>
+        </Animated.View>
 
-        {/* 1. HERO DOMINANT CARD — Peso corporal */}
-        <Card variant="elevated" style={styles.heroCard}>
-          <View style={styles.heroHeader}>
-            <View>
-              <Caption style={styles.heroSubLabel}>PESO ACTUAL</Caption>
-              <LabelMedium style={styles.weightNumber}>
-                {latestWeight.weight} <Caption style={styles.unitText}>kg</Caption>
-              </LabelMedium>
+        {/* 1. HERO GLASS CARD — Peso corporal */}
+        <Animated.View entering={FadeInDown.delay(100).duration(350)}>
+          <GlassCard level="hero" style={styles.heroGlass}>
+            <View style={styles.heroHeader}>
+              <View style={styles.heroMainColumn}>
+                <Caption style={styles.heroSubLabel}>PESO ACTUAL</Caption>
+                <View style={styles.weightValueRow}>
+                  <LabelMedium style={styles.weightNumber}>{latestWeight.weight}</LabelMedium>
+                  <Caption style={styles.unitText}>kg</Caption>
+                </View>
+              </View>
+
+              <View style={styles.weightChangeBadge}>
+                <LabelMedium style={styles.weightDeltaText}>
+                  {weightChange > 0 ? '+' : ''}{weightChange.toFixed(1)} kg
+                </LabelMedium>
+                <Caption style={styles.weightDeltaSub}>vs inicio</Caption>
+              </View>
             </View>
-            <View style={styles.weightChangeBadge}>
-              <LabelMedium style={styles.weightDeltaText}>
-                {weightChange > 0 ? '+' : ''}{weightChange.toFixed(1)} kg
-              </LabelMedium>
-              <Caption style={styles.weightDeltaSub}>vs inicio</Caption>
+
+            {/* High impact weight curve chart */}
+            <View style={styles.chartContainer}>
+              {mockWeightHistory.map((entry, index) => {
+                const min = Math.min(...mockWeightHistory.map((e) => e.weight));
+                const max = Math.max(...mockWeightHistory.map((e) => e.weight));
+                const range = max - min || 1;
+                const normalizedHeight = ((entry.weight - min) / range) * 70 + 18;
+
+                const isLast = index === mockWeightHistory.length - 1;
+
+                return (
+                  <View key={entry.date} style={styles.chartBarColumn}>
+                    <View
+                      style={[
+                        styles.chartBar,
+                        {
+                          height: normalizedHeight,
+                          backgroundColor: isLast ? '#0A84FF' : 'rgba(255, 255, 255, 0.12)',
+                        },
+                      ]}
+                    />
+                    <Caption style={[styles.chartLabel, isLast && styles.chartLabelActive]}>
+                      {entry.date.slice(5, 10)}
+                    </Caption>
+                  </View>
+                );
+              })}
             </View>
-          </View>
+          </GlassCard>
+        </Animated.View>
 
-          {/* High impact weight curve chart */}
-          <View style={styles.chartContainer}>
-            {mockWeightHistory.map((entry, index) => {
-              const min = Math.min(...mockWeightHistory.map((e) => e.weight));
-              const max = Math.max(...mockWeightHistory.map((e) => e.weight));
-              const range = max - min || 1;
-              const normalizedHeight = ((entry.weight - min) / range) * 70 + 25;
+        {/* 2. UNIFIED SPATIAL GLASS SECTION — Historial de entrenamientos */}
+        <Animated.View entering={FadeInDown.delay(200).duration(350)} style={styles.secondarySection}>
+          <TitleSmall style={styles.sectionTitle}>Historial de entrenamientos</TitleSmall>
+          <GlassCard level="subtle" padding={0} style={styles.unifiedStatBar}>
+            <View style={styles.statItem}>
+              <View style={[styles.statIconBadge, { backgroundColor: 'rgba(255, 159, 10, 0.16)', borderColor: 'rgba(255, 159, 10, 0.30)' }]}>
+                <Fire size={16} color="#FF9F0A" weight="fill" />
+              </View>
+              <LabelMedium style={styles.statValue}>12</LabelMedium>
+              <Caption style={styles.statLabel}>Este mes</Caption>
+            </View>
 
-              const isLast = index === mockWeightHistory.length - 1;
+            <View style={styles.statDivider} />
+
+            <View style={styles.statItem}>
+              <View style={[styles.statIconBadge, { backgroundColor: 'rgba(255, 55, 95, 0.16)', borderColor: 'rgba(255, 55, 95, 0.30)' }]}>
+                <Trophy size={16} color="#FF375F" weight="fill" />
+              </View>
+              <LabelMedium style={styles.statValue}>47</LabelMedium>
+              <Caption style={styles.statLabel}>Total</Caption>
+            </View>
+
+            <View style={styles.statDivider} />
+
+            <View style={styles.statItem}>
+              <View style={[styles.statIconBadge, { backgroundColor: 'rgba(94, 92, 230, 0.16)', borderColor: 'rgba(94, 92, 230, 0.30)' }]}>
+                <Clock size={16} color="#5E5CE6" weight="fill" />
+              </View>
+              <LabelMedium style={styles.statValue}>38h</LabelMedium>
+              <Caption style={styles.statLabel}>Tiempo total</Caption>
+            </View>
+          </GlassCard>
+        </Animated.View>
+
+        {/* 3. COLLAPSIBLE GLASS WELLNESS TRENDS */}
+        <Animated.View entering={FadeInDown.delay(300).duration(350)} style={styles.secondarySection}>
+          <TitleSmall style={styles.sectionTitle}>Tendencia de bienestar</TitleSmall>
+          <View style={styles.wellnessList}>
+            {mockWellnessHistory.slice(-4).reverse().map((entry) => {
+              const isExpanded = expandedWellnessId === entry.id;
 
               return (
-                <View key={entry.date} style={styles.chartBarColumn}>
-                  <View
-                    style={[
-                      styles.chartBar,
-                      {
-                        height: normalizedHeight,
-                        backgroundColor: isLast ? '#007AFF' : 'rgba(0, 122, 255, 0.25)',
-                      },
-                    ]}
-                  />
-                  <Caption style={[styles.chartLabel, isLast && styles.chartLabelActive]}>
-                    {entry.date.slice(5, 10)}
-                  </Caption>
-                </View>
+                <GlassCard
+                  key={entry.id}
+                  level="medium"
+                  padding={0}
+                  onPress={() => setExpandedWellnessId(isExpanded ? null : entry.id)}
+                  style={styles.wellnessGlassItem}
+                >
+                  <View style={styles.wellnessHeaderRow}>
+                    <View style={styles.dateBadge}>
+                      <Caption style={styles.dateText}>{entry.date.slice(5, 10)}</Caption>
+                    </View>
+
+                    <View style={styles.quickMetricsRow}>
+                      <View style={styles.miniMetricPill}>
+                        <Lightning size={14} color="#FF9F0A" weight="fill" />
+                        <Caption style={styles.pillText}>{entry.energy}/5</Caption>
+                      </View>
+
+                      {getMoodIcon(entry.mood, 18)}
+
+                      <CaretDown
+                        size={16}
+                        color="#9898A0"
+                        style={{ transform: [{ rotate: isExpanded ? '180deg' : '0deg' }] }}
+                      />
+                    </View>
+                  </View>
+
+                  {/* Expanded detail view */}
+                  {isExpanded && (
+                    <Animated.View entering={FadeInDown.duration(200)} style={styles.expandedDetailsContainer}>
+                      <View style={styles.expandedMetric}>
+                        <Moon size={16} color="#5E5CE6" weight="fill" />
+                        <Caption style={{ color: '#9898A0' }}>Sueño:</Caption>
+                        <LabelMedium style={styles.detailValue}>{entry.sleepHours}h</LabelMedium>
+                      </View>
+
+                      <View style={styles.expandedMetric}>
+                        <Brain size={16} color="#0A84FF" weight="fill" />
+                        <Caption style={{ color: '#9898A0' }}>Estrés:</Caption>
+                        <LabelMedium style={styles.detailValue}>{entry.stress}/5</LabelMedium>
+                      </View>
+                    </Animated.View>
+                  )}
+                </GlassCard>
               );
             })}
           </View>
-        </Card>
-
-        {/* 2. FRAMELESS SECONDARY SECTION — Historial de entrenamientos */}
-        <View style={styles.secondarySection}>
-          <TitleSmall style={styles.sectionTitle}>Historial de entrenamientos</TitleSmall>
-          <View style={styles.statRow}>
-            <View style={styles.statBoxOrganic}>
-              <View style={[styles.statIconBadge, { backgroundColor: 'rgba(255, 149, 0, 0.12)' }]}>
-                <Fire size={18} color="#FF9500" weight="fill" />
-              </View>
-              <LabelMedium style={styles.statValue}>12</LabelMedium>
-              <Caption color={colors.muted}>Este mes</Caption>
-            </View>
-
-            <View style={styles.statBoxOrganic}>
-              <View style={[styles.statIconBadge, { backgroundColor: 'rgba(255, 45, 85, 0.12)' }]}>
-                <Trophy size={18} color="#FF2D55" weight="fill" />
-              </View>
-              <LabelMedium style={styles.statValue}>47</LabelMedium>
-              <Caption color={colors.muted}>Total</Caption>
-            </View>
-
-            <View style={styles.statBoxOrganic}>
-              <View style={[styles.statIconBadge, { backgroundColor: 'rgba(88, 86, 214, 0.12)' }]}>
-                <Clock size={18} color="#5856D6" weight="fill" />
-              </View>
-              <LabelMedium style={styles.statValue}>38h</LabelMedium>
-              <Caption color={colors.muted}>Tiempo total</Caption>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.divider} />
-
-        {/* 3. FRAMELESS ORGANIC SECTION — Tendencia de bienestar */}
-        <View style={styles.secondarySection}>
-          <TitleSmall style={styles.sectionTitle}>Tendencia de bienestar</TitleSmall>
-          <View style={styles.organicWellnessList}>
-            {mockWellnessHistory.slice(-4).reverse().map((entry) => (
-              <View key={entry.id} style={styles.organicWellnessCard}>
-                <View style={styles.organicDateBadge}>
-                  <Caption style={styles.organicDateText}>{entry.date.slice(5, 10)}</Caption>
-                </View>
-                <View style={styles.organicMetricsContainer}>
-                  <View style={styles.organicBadge}>
-                    <Lightning size={16} color="#FF9500" weight="fill" />
-                    <Caption style={styles.badgeText}>{entry.energy}/5</Caption>
-                  </View>
-
-                  <View style={styles.organicBadge}>
-                    <Moon size={16} color="#5856D6" weight="fill" />
-                    <Caption style={styles.badgeText}>{entry.sleepHours}h</Caption>
-                  </View>
-
-                  <View style={styles.organicBadge}>
-                    <Brain size={16} color="#007AFF" weight="fill" />
-                    <Caption style={styles.badgeText}>{entry.stress}/5</Caption>
-                  </View>
-
-                  <View style={styles.moodBadgeContainer}>
-                    {getMoodIcon(entry.mood, 18)}
-                  </View>
-                </View>
-              </View>
-            ))}
-          </View>
-        </View>
+        </Animated.View>
+        
+        <View style={{ height: 40 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -148,205 +185,228 @@ export default function ProgressScreen() {
 function getMoodIcon(mood: MoodType, size: number) {
   switch (mood) {
     case 'excellent':
-      return <Star size={size} color="#FFCC00" weight="fill" />;
+      return <Star size={size} color="#FFD60A" weight="fill" />;
     case 'good':
-      return <Smiley size={size} color="#34C759" weight="fill" />;
+      return <Smiley size={size} color="#30D158" weight="fill" />;
     case 'neutral':
-      return <SmileyMeh size={size} color="#8E8E93" weight="fill" />;
+      return <SmileyMeh size={size} color="#9898A0" weight="fill" />;
     case 'sad':
-      return <SmileySad size={size} color="#FF9500" weight="fill" />;
+      return <SmileySad size={size} color="#FF9F0A" weight="fill" />;
     case 'stressed':
-      return <WarningCircle size={size} color="#FF3B30" weight="fill" />;
+      return <WarningCircle size={size} color="#FF453A" weight="fill" />;
     default:
-      return <Smiley size={size} color="#8E8E93" weight="fill" />;
+      return <Smiley size={size} color="#9898A0" weight="fill" />;
   }
 }
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: '#0A0A0F',
   },
   container: {
     flex: 1,
   },
   content: {
     padding: spacing.md,
-    paddingBottom: 150,
+    paddingBottom: 180,
   },
   pageTitle: {
-    fontSize: 34,
-    fontWeight: '800',
-    letterSpacing: 0.4,
+    fontSize: 32,
+    fontWeight: '700',
+    letterSpacing: -0.5,
+    color: '#F2F2F7',
   },
   subtitle: {
     marginTop: 2,
     marginBottom: spacing.lg,
+    color: '#9898A0',
   },
-  // HERO CARD
-  heroCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: spacing.lg,
+  // HERO GLASS CARD
+  heroGlass: {
     marginBottom: spacing.lg,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 3,
-    borderWidth: 0,
   },
   heroHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: spacing.lg,
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  heroMainColumn: {
+    flex: 1,
+    marginRight: spacing.sm,
   },
   heroSubLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
     letterSpacing: 0.8,
-    color: '#8E8E93',
+    color: '#9898A0',
     marginBottom: 2,
   },
+  weightValueRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 4,
+  },
   weightNumber: {
-    fontSize: 36,
-    fontWeight: '800',
-    letterSpacing: -1,
-    color: colors.text,
+    fontSize: 32,
+    fontWeight: '700',
+    letterSpacing: -0.8,
+    color: '#F2F2F7',
+    lineHeight: 38,
   },
   unitText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
-    color: colors.muted,
+    color: '#9898A0',
   },
   weightChangeBadge: {
-    backgroundColor: 'rgba(52, 199, 89, 0.12)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
+    backgroundColor: 'rgba(48, 209, 88, 0.14)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
     alignItems: 'flex-end',
+    borderWidth: 1,
+    borderColor: 'rgba(48, 209, 88, 0.22)',
   },
   weightDeltaText: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#34C759',
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#30D158',
   },
   weightDeltaSub: {
-    fontSize: 10,
-    color: '#34C759',
+    fontSize: 9,
+    color: '#30D158',
   },
   chartContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    height: 120,
-    paddingTop: spacing.md,
+    height: 110,
+    paddingTop: spacing.sm,
   },
   chartBarColumn: {
     flex: 1,
     alignItems: 'center',
   },
   chartBar: {
-    width: 20,
-    borderRadius: 10,
+    width: 14,
+    borderRadius: 7,
   },
   chartLabel: {
     marginTop: spacing.xs,
     fontSize: 10,
-    color: '#8E8E93',
+    color: '#9898A0',
   },
   chartLabelActive: {
-    color: '#007AFF',
+    color: '#F2F2F7',
     fontWeight: '700',
   },
-  // SECONDARY FRAMELESS SECTIONS
+  // SECONDARY SECTION
   secondarySection: {
     marginVertical: spacing.sm,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
-    marginBottom: spacing.md,
+    color: '#F2F2F7',
+    marginBottom: spacing.sm,
   },
-  divider: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: 'rgba(0, 0, 0, 0.08)',
-    marginVertical: spacing.md,
-  },
-  statRow: {
+  unifiedStatBar: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: spacing.sm,
-  },
-  statBoxOrganic: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: spacing.md,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 1,
+    justifyContent: 'space-around',
+    paddingVertical: 14,
   },
-  statIconBadge: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+  statItem: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 6,
+  },
+  statDivider: {
+    width: 1,
+    height: 36,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  statIconBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+    borderWidth: 1,
   },
   statValue: {
-    fontSize: 20,
-    fontWeight: '800',
-    marginBottom: 2,
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#F2F2F7',
+    marginBottom: 1,
   },
-  // ORGANIC WELLNESS TRENDS
-  organicWellnessList: {
-    gap: spacing.sm,
+  statLabel: {
+    fontSize: 10,
+    color: '#9898A0',
   },
-  organicWellnessCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    padding: 12,
+  // WELLNESS LIST
+  wellnessList: {
+    gap: spacing.xs,
+  },
+  wellnessGlassItem: {
+    overflow: 'hidden',
+  },
+  wellnessHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    padding: spacing.md,
   },
-  organicDateBadge: {
-    backgroundColor: '#F2F2F7',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  organicDateText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#8E8E93',
-  },
-  organicMetricsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  organicBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F2F2F7',
+  dateBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
     paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  dateText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#F2F2F7',
+  },
+  quickMetricsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  miniMetricPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 159, 10, 0.14)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
     gap: 4,
   },
-  badgeText: {
+  pillText: {
     fontSize: 11,
     fontWeight: '700',
-    color: colors.text,
+    color: '#FF9F0A',
   },
-  moodBadgeContainer: {
-    marginLeft: 4,
+  expandedDetailsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.05)',
+    paddingTop: spacing.xs,
+  },
+  expandedMetric: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  detailValue: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#F2F2F7',
   },
 });
