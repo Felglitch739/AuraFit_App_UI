@@ -36,8 +36,8 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
   useEffect(() => {
     if (tabWidth > 0) {
       translateX.value = withSpring(activeIndex * tabWidth + 6, {
-        damping: 18,
-        stiffness: 220,
+        damping: 26,
+        stiffness: 140,
       });
     }
   }, [activeIndex, tabWidth]);
@@ -122,10 +122,9 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
             {
               borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.08)',
               backgroundColor: isDark ? 'rgba(18, 18, 22, 0.88)' : 'rgba(255, 255, 255, 0.88)',
-              // @ts-ignore WebkitBackdropFilter for frosted glass blur on web
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
-            },
+            } as any,
           ]}
         >
           {renderContent()}
