@@ -133,7 +133,6 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
         <BlurView
           intensity={90}
           tint={isDark ? 'dark' : 'light'}
-          experimentalBlurMethod="dimezisBlurView"
           style={[
             styles.blurContainer,
             {

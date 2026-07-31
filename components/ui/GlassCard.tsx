@@ -125,7 +125,6 @@ export function GlassCard({
     <BlurView
       intensity={intensityMap[level]}
       tint={isDark ? "dark" : "light"}
-      experimentalBlurMethod="dimezisBlurView"
       style={[styles.blurContainer, cardStyle]}
       {...props}
     >
