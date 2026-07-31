@@ -23,12 +23,17 @@ export interface WellnessData {
   lastCheckinDate: string | null;
 }
 
+export type ThemeMode = 'dark' | 'light';
+
 interface UserState {
   isOnboarded: boolean;
+  themeMode: ThemeMode;
   profile: UserProfile;
   wellness: WellnessData;
   
   // Actions
+  setThemeMode: (mode: ThemeMode) => void;
+  toggleThemeMode: () => void;
   completeOnboarding: (profileData: Partial<UserProfile>) => void;
   updateProfile: (data: Partial<UserProfile>) => void;
   submitDailyCheckin: (data: Omit<WellnessData, 'lastCheckinDate'>) => void;
@@ -59,8 +64,16 @@ export const useUserStore = create<UserState>()(
   persist(
     (set) => ({
       isOnboarded: false,
+      themeMode: 'dark',
       profile: defaultProfile,
       wellness: defaultWellness,
+
+      setThemeMode: (mode) => set({ themeMode: mode }),
+
+      toggleThemeMode: () =>
+        set((state) => ({
+          themeMode: state.themeMode === 'dark' ? 'light' : 'dark',
+        })),
 
       completeOnboarding: (profileData) =>
         set((state) => ({
@@ -84,6 +97,7 @@ export const useUserStore = create<UserState>()(
       resetApp: () =>
         set(() => ({
           isOnboarded: false,
+          themeMode: 'dark',
           profile: defaultProfile,
           wellness: defaultWellness,
         })),

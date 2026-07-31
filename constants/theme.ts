@@ -1,14 +1,5 @@
 /**
- * AuraFit Design System — Design Tokens
- *
- * Regla de oro: sombras SIMPLES. Una sola sombra sutil.
- * Sin sombra dual, sin librerías externas, sin neumorfismo.
- *
- * Validado contra context.md §7:
- * - Fondo blanco puro, cards gris muy claro
- * - Bordes redondeados grandes y consistentes
- * - Sombras casi imperceptibles
- * - Sensación "premium, minimalista, tranquilo"
+ * AuraFit Design System — Design Tokens & Theme Manager
  */
 
 import { Platform, type ViewStyle } from 'react-native';
@@ -16,65 +7,85 @@ import { Platform, type ViewStyle } from 'react-native';
 // ─── COLORS ────────────────────────────────────────────────────
 export const lightColors = {
   primary: '#007AFF',       // iOS System Blue
-  onPrimary: '#FFFFFF',     // Blanco puro para contraste
-  secondary: '#5AC8FA',     // iOS Light Blue para acentos secundarios
-  accent: '#34C759',        // iOS System Green para CTA / éxitos
+  onPrimary: '#FFFFFF',     // Pure White
+  secondary: '#5AC8FA',     // iOS Light Blue
+  accent: '#34C759',        // iOS System Green
+  blue: '#007AFF',
+  orange: '#FF9500',
+  purple: '#5856D6',
 
-  background: '#F2F2F7',    // Fondo general (iOS System Grouped Background)
-  surface: '#FFFFFF',       // Cards (Blanco puro)
-  surfaceElevated: '#FFFFFF', 
+  background: '#F2F2F7',    // iOS System Grouped Background
+  bgSecondary: '#E5E5EA',
+  surface: '#FFFFFF',       // Clean White Cards
+  surfaceElevated: '#FFFFFF',
 
-  foreground: '#000000',    // Texto principal (iOS Black)
-  muted: '#8E8E93',         // Texto secundario (iOS System Gray)
-  subtle: '#C7C7CC',        // Texto terciario / disabled
+  foreground: '#000000',    // Text Primary
+  text: '#000000',
+  muted: '#8E8E93',         // Text Secondary
+  subtle: '#C7C7CC',        // Text Disabled
+  icon: '#8E8E93',
 
-  border: '#C6C6C8',        // Bordes (iOS Separator)
-  borderLight: '#E5E5EA',   // Bordes sutiles (iOS Opaque Separator)
+  border: '#C6C6C8',        // iOS Separator
+  borderActive: '#007AFF',
+  borderLight: '#E5E5EA',
 
-  destructive: '#FF3B30',   // iOS System Red
-  warning: '#FF9500',       // iOS System Orange
-  success: '#34C759',       // iOS System Green
+  destructive: '#FF3B30',
+  warning: '#FF9500',
+  success: '#34C759',
 
-  protein: '#FF3B30',       // Rojo
-  carbs: '#FFCC00',         // Amarillo iOS
-  fats: '#007AFF',          // Azul iOS
+  protein: '#FF3B30',       // Red
+  carbs: '#FFCC00',         // Yellow
+  fats: '#007AFF',          // Blue
 
   energyHigh: '#FF9500',
   energyLow: '#8E8E93',
-  sleepGood: '#5856D6',     // iOS Purple/Indigo
+  sleepGood: '#5856D6',
   stressLow: '#34C759',
   stressHigh: '#FF3B30',
 
-  glowPrimary: 'rgba(0, 122, 255, 0.4)',
-  glowAccent: 'rgba(52, 199, 89, 0.4)',
+  glowCyan: 'rgba(0, 122, 255, 0.20)',
+  glowPurple: 'rgba(88, 86, 214, 0.20)',
+  glowBlue: 'rgba(0, 122, 255, 0.20)',
+  glowGreen: 'rgba(52, 199, 89, 0.20)',
+  glowOrange: 'rgba(255, 149, 0, 0.20)',
 
   tabIconDefault: '#8E8E93',
   tabIconSelected: '#007AFF',
 } as const;
 
 export const darkColors = {
-  // Core (Oura / Whoop / Linear inspired)
+  // Core (Original Dark Mode: Oura / Whoop / Linear inspired)
   primary: '#0A84FF',       // Neon Electric Blue
   onPrimary: '#FFFFFF',     // Pure White
   secondary: '#5E5CE6',     // Electric Indigo
+  blue: '#0A84FF',
   accent: '#30D158',        // Neon Green
+  orange: '#FF9F0A',
+  purple: '#5E5CE6',
 
   // Glow Colors
-  glowPrimary: '#0A84FF',
-  glowAccent: '#30D158',
+  glowCyan: 'rgba(10, 132, 255, 0.35)',
+  glowPurple: 'rgba(94, 92, 230, 0.35)',
+  glowBlue: 'rgba(10, 132, 255, 0.35)',
+  glowGreen: 'rgba(48, 209, 88, 0.35)',
+  glowOrange: 'rgba(255, 159, 10, 0.35)',
 
   // Surfaces (Cold near-pure black & dark solid cards)
   background: '#0A0A0F',    // Deep cold black
+  bgSecondary: '#14141A',   // Solid dark surface
   surface: '#14141A',       // Solid dark card surface
   surfaceElevated: '#1C1C24', 
 
   // Text Hierarchy
-  foreground: '#FFFFFF',    // Primary text / Big numbers (Pure White)
-  muted: '#8E8E93',         // Secondary text / Labels (iOS System Gray)
-  subtle: '#48484A',        // Tertiary text / disabled
+  foreground: '#FFFFFF',    // Pure White
+  text: '#FFFFFF',
+  muted: '#8E8E93',         // Secondary text / Labels
+  subtle: '#48484A',        // Disabled text
+  icon: '#8E8E93',
 
   // Borders (Crisp 1px subtle white outlines)
   border: 'rgba(255, 255, 255, 0.12)',
+  borderActive: '#0A84FF',
   borderLight: 'rgba(255, 255, 255, 0.08)',
 
   // Feedback
@@ -99,7 +110,11 @@ export const darkColors = {
   tabIconSelected: '#FFFFFF',
 } as const;
 
-// Active Theme Palette for feature/ui-experiments branch
+export function getThemeColors(mode: 'dark' | 'light') {
+  return mode === 'light' ? lightColors : darkColors;
+}
+
+// Active default export
 export const colors = darkColors;
 
 // ─── SPACING (8dp rhythm) ──────────────────────────────────────
@@ -123,12 +138,7 @@ export const radius = {
 } as const;
 
 // ─── TYPOGRAPHY ────────────────────────────────────────────────
-// Usamos la fuente del sistema por defecto (San Francisco en iOS,
-// Roboto en Android). Inter se cargará después vía expo-font.
-// Por ahora, system font funciona bien y es la fallback más segura.
-
 export const typography = {
-  // Números grandes (calorías, pesos)
   displayLarge: {
     fontSize: 48,
     fontWeight: '700' as const,
@@ -139,7 +149,6 @@ export const typography = {
     fontWeight: '700' as const,
     lineHeight: 40,
   },
-  // Títulos de sección
   titleLarge: {
     fontSize: 24,
     fontWeight: '600' as const,
@@ -155,7 +164,6 @@ export const typography = {
     fontWeight: '600' as const,
     lineHeight: 24,
   },
-  // Subtítulos / labels
   labelLarge: {
     fontSize: 16,
     fontWeight: '500' as const,
@@ -171,7 +179,6 @@ export const typography = {
     fontWeight: '500' as const,
     lineHeight: 16,
   },
-  // Body text
   bodyLarge: {
     fontSize: 16,
     fontWeight: '400' as const,
@@ -187,7 +194,6 @@ export const typography = {
     fontWeight: '400' as const,
     lineHeight: 16,
   },
-  // Captions
   caption: {
     fontSize: 11,
     fontWeight: '400' as const,
@@ -196,16 +202,12 @@ export const typography = {
 } as const;
 
 // ─── SHADOWS ───────────────────────────────────────────────────
-// En la estética Apple HIG (flat design actual), agrupamos con fondos y bordes 
-// extremadamente finos o sombras casi nulas.
-
 export const shadows = {
-  /** Sombra sutil / borde para cards en dark mode */
   card: Platform.select<ViewStyle>({
     ios: {
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
+      shadowOpacity: 0.15,
       shadowRadius: 8,
     },
     android: {
@@ -214,12 +216,11 @@ export const shadows = {
     default: {},
   }) as ViewStyle,
 
-  /** Sombra sutil de elevación (modales, popovers) */
   cardElevated: Platform.select<ViewStyle>({
     ios: {
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.5,
+      shadowOpacity: 0.25,
       shadowRadius: 16,
     },
     android: {
@@ -228,30 +229,28 @@ export const shadows = {
     default: {},
   }) as ViewStyle,
 
-  /** GLOW Eléctrico Azul sutil para anillo / CTA principal */
   glowPrimary: Platform.select<ViewStyle>({
     ios: {
       shadowColor: '#0A84FF',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.22,
-      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.55,
+      shadowRadius: 12,
     },
     android: {
-      elevation: 3,
+      elevation: 8,
     },
     default: {},
   }) as ViewStyle,
 
-  /** GLOW Neón Verde sutil */
   glowAccent: Platform.select<ViewStyle>({
     ios: {
       shadowColor: '#30D158',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.22,
-      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.55,
+      shadowRadius: 12,
     },
     android: {
-      elevation: 3,
+      elevation: 8,
     },
     default: {},
   }) as ViewStyle,
@@ -259,7 +258,6 @@ export const shadows = {
   none: {} as ViewStyle,
 } as const;
 
-// ─── ICON SIZES ────────────────────────────────────────────────
 export const iconSizes = {
   sm: 16,
   md: 24,
@@ -267,38 +265,18 @@ export const iconSizes = {
   xl: 40,
 } as const;
 
-// ─── TOUCH TARGETS ─────────────────────────────────────────────
-// Mínimo 44×44pt (iOS) / 48×48dp (Android) — WCAG
 export const touchTargets = {
   minimum: 44,
   comfortable: 48,
 } as const;
 
-// ─── ANIMATION TIMING ──────────────────────────────────────────
 export const animation = {
   fast: 150,
   normal: 250,
   slow: 350,
 } as const;
 
-// ─── LEGACY COMPAT (para scaffold existente que usa Colors) ────
 export const Colors = {
-  light: {
-    text: colors.foreground,
-    background: colors.background,
-    tint: colors.primary,
-    icon: colors.muted,
-    tabIconDefault: colors.tabIconDefault,
-    tabIconSelected: colors.tabIconSelected,
-  },
-  dark: {
-    // Dark mode fuera de scope para v1 (context.md §6),
-    // pero dejamos los tokens para no romper el scaffold
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: '#FFFFFF',
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: '#FFFFFF',
-  },
+  light: lightColors,
+  dark: darkColors,
 } as const;
