@@ -2,8 +2,8 @@ import React from 'react';
 import { ScrollView, View, StyleSheet, Pressable, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
-  MeshBackground, GlassCard, TitleLarge, TitleSmall, LabelMedium,
-  BodySmall, Caption, ProgressRing,
+  MeshBackground, GlassCard, LabelMedium,
+  BodySmall, Caption, ProgressRing, AnimatedCountUp, StaggerView,
 } from '@/components/ui';
 import { spacing, radius } from '@/constants/theme';
 import { Sun, ForkKnife, Moon, Coffee, Plus, Camera, Sparkle } from 'phosphor-react-native';
@@ -41,138 +41,164 @@ export default function NutritionScreen() {
           showsVerticalScrollIndicator={false}
         >
           {/* Header */}
-          <Text style={[styles.largeTitle, { color: colors.foreground }]}>Nutrición</Text>
-          <BodySmall style={[styles.date, { color: colors.muted }]}>
-            Hoy
-          </BodySmall>
+          <StaggerView index={0}>
+            <Text style={[styles.largeTitle, { color: colors.foreground }]}>Nutrición</Text>
+            <BodySmall style={[styles.date, { color: colors.muted }]}>
+              Hoy
+            </BodySmall>
+          </StaggerView>
 
           {/* Daily Summary Card */}
-          <GlassCard level="hero" style={styles.summaryCard}>
-            <View style={styles.summaryRow}>
-              <ProgressRing
-                progress={calorieProgress}
-                size={104}
-                strokeWidth={11}
-                color={colors.primary}
-                gradientColors={isDark ? ['#0A84FF', '#5E5CE6'] : ['#007AFF', '#5AC8FA']}
-              >
-                <LabelMedium style={[styles.calorieNumber, { color: colors.foreground }]}>
-                  {nutrition.totalCalories}
-                </LabelMedium>
-                <Caption style={{ color: colors.muted }}>kcal</Caption>
-              </ProgressRing>
+          <StaggerView index={1}>
+            <GlassCard level="hero" glowColor="#3B82F6" style={styles.summaryCard}>
+              <View style={styles.summaryRow}>
+                <ProgressRing
+                  progress={calorieProgress}
+                  size={116}
+                  strokeWidth={14}
+                  gradientColors={['#00F2FE', '#3B82F6']}
+                >
+                  <AnimatedCountUp
+                    value={nutrition.totalCalories}
+                    duration={1200}
+                    style={[styles.calorieNumber, { color: colors.foreground }]}
+                  />
+                  <Caption style={{ color: colors.muted, fontWeight: '700' }}>
+                    / {nutrition.calorieTarget} kcal
+                  </Caption>
+                </ProgressRing>
 
-              <View style={styles.macrosSummary}>
-                <MacroBar
-                  label="Proteína"
-                  current={nutrition.totalProtein}
-                  target={nutrition.proteinTarget}
-                  color={colors.protein}
-                />
-                <MacroBar
-                  label="Carbos"
-                  current={nutrition.totalCarbs}
-                  target={nutrition.carbsTarget}
-                  color={colors.carbs}
-                />
-                <MacroBar
-                  label="Grasas"
-                  current={nutrition.totalFats}
-                  target={nutrition.fatsTarget}
-                  color={colors.fats}
-                />
-              </View>
-            </View>
-          </GlassCard>
-
-          {/* AI Camera Meal Scanner — Tarjeta unificada interactiva sin botón sobrante abajo */}
-          <GlassCard
-            level="hero"
-            onPress={() => {}}
-            style={[
-              styles.cameraCard,
-              {
-                borderColor: isDark ? 'rgba(10, 132, 255, 0.35)' : 'rgba(0, 122, 255, 0.25)',
-              },
-            ]}
-          >
-            <View style={styles.cameraRow}>
-              <View
-                style={[
-                  styles.cameraIconContainer,
-                  {
-                    backgroundColor: isDark ? 'rgba(10, 132, 255, 0.16)' : 'rgba(0, 122, 255, 0.10)',
-                  },
-                ]}
-              >
-                <Camera size={22} color={colors.primary} weight="fill" />
-              </View>
-              <View style={styles.cameraTextCol}>
-                <View style={styles.aiBadgeRow}>
-                  <Sparkle size={12} color={colors.primary} weight="fill" />
-                  <Text style={[styles.aiBadgeText, { color: colors.primary }]}>RECONOCIMIENTO IA</Text>
+                <View style={styles.macrosSummary}>
+                  <MacroBar
+                    label="Proteína"
+                    current={nutrition.totalProtein}
+                    target={nutrition.proteinTarget}
+                    color="#3B82F6"
+                  />
+                  <MacroBar
+                    label="Carbos"
+                    current={nutrition.totalCarbs}
+                    target={nutrition.carbsTarget}
+                    color="#F97316"
+                  />
+                  <MacroBar
+                    label="Grasas"
+                    current={nutrition.totalFats}
+                    target={nutrition.fatsTarget}
+                    color="#A855F7"
+                  />
                 </View>
-                <Text style={[styles.cameraTitle, { color: colors.foreground }]}>Analizar comida con foto</Text>
-                <Caption style={{ color: colors.muted }}>Toca para escanear plato y calcular macros</Caption>
               </View>
-              <View style={[styles.cameraActionBadge, { backgroundColor: colors.primary }]}>
-                <Camera size={18} color={colors.onPrimary} weight="fill" />
+            </GlassCard>
+          </StaggerView>
+
+          {/* AI Camera Meal Scanner — Tarjeta unificada interactiva */}
+          <StaggerView index={2}>
+            <GlassCard
+              level="hero"
+              glowColor="#3B82F6"
+              onPress={() => {}}
+              style={[
+                styles.cameraCard,
+                {
+                  borderColor: isDark ? 'rgba(59, 130, 246, 0.4)' : 'rgba(59, 130, 246, 0.3)',
+                },
+              ]}
+            >
+              <View style={styles.cameraRow}>
+                <View
+                  style={[
+                    styles.cameraIconContainer,
+                    {
+                      backgroundColor: isDark ? 'rgba(59, 130, 246, 0.22)' : 'rgba(59, 130, 246, 0.14)',
+                    },
+                  ]}
+                >
+                  <Camera size={24} color="#3B82F6" weight="fill" />
+                </View>
+                <View style={styles.cameraTextCol}>
+                  <View style={styles.aiBadgeRow}>
+                    <Sparkle size={13} color="#3B82F6" weight="fill" />
+                    <Text style={[styles.aiBadgeText, { color: '#3B82F6' }]}>RECONOCIMIENTO IA</Text>
+                  </View>
+                  <Text style={[styles.cameraTitle, { color: colors.foreground }]}>Analizar comida con foto</Text>
+                  <Caption style={{ color: colors.muted }}>Toca para escanear plato y calcular macros</Caption>
+                </View>
+                <View style={[styles.cameraActionBadge, { backgroundColor: '#3B82F6' }]}>
+                  <Camera size={18} color="#FFFFFF" weight="fill" />
+                </View>
               </View>
-            </View>
-          </GlassCard>
+            </GlassCard>
+          </StaggerView>
+
+          {/* Meals Header */}
+          <StaggerView index={3}>
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Comidas de hoy</Text>
+          </StaggerView>
 
           {/* Meals */}
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Comidas de hoy</Text>
-
-          {ALL_MEAL_TYPES.map((mealType) => {
+          {ALL_MEAL_TYPES.map((mealType, i) => {
             const meal = nutrition.meals.find(m => m.type === mealType);
+            const mealGlowColors: Record<MealType, string> = {
+              breakfast: '#F97316',
+              lunch: '#3B82F6',
+              dinner: '#A855F7',
+              snack: '#10B981',
+            };
 
             return (
-              <GlassCard key={mealType} level="medium" style={styles.mealCard} onPress={() => {}}>
-                <View style={styles.mealHeader}>
-                  <View style={[styles.mealIconContainer, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F2F2F7' }]}>
-                    {React.createElement(MEAL_TYPE_ICONS[mealType], {
-                      size: 18,
-                      color: colors.primary,
-                      weight: 'fill',
-                    })}
+              <StaggerView key={mealType} index={4 + i}>
+                <GlassCard
+                  level="medium"
+                  glowColor={mealGlowColors[mealType]}
+                  style={styles.mealCard}
+                  onPress={() => {}}
+                >
+                  <View style={styles.mealHeader}>
+                    <View style={[styles.mealIconContainer, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#F2F2F7' }]}>
+                      {React.createElement(MEAL_TYPE_ICONS[mealType], {
+                        size: 19,
+                        color: mealGlowColors[mealType],
+                        weight: 'fill',
+                      })}
+                    </View>
+                    <View style={styles.mealHeaderText}>
+                      <LabelMedium style={{ color: colors.foreground, fontWeight: '800' }}>
+                        {MEAL_TYPE_LABELS[mealType]}
+                      </LabelMedium>
+                      {meal && (
+                        <Caption style={{ color: colors.muted, fontWeight: '600' }}>{meal.totalCalories} kcal</Caption>
+                      )}
+                    </View>
+                    <Pressable
+                      style={styles.addButton}
+                      accessibilityLabel={`Agregar ${MEAL_TYPE_LABELS[mealType]}`}
+                      accessibilityRole="button"
+                    >
+                      <Plus size={20} color={mealGlowColors[mealType]} weight="bold" />
+                    </Pressable>
                   </View>
-                  <View style={styles.mealHeaderText}>
-                    <LabelMedium style={{ color: colors.foreground, fontWeight: '700' }}>
-                      {MEAL_TYPE_LABELS[mealType]}
-                    </LabelMedium>
-                    {meal && (
-                      <Caption style={{ color: colors.muted }}>{meal.totalCalories} kcal</Caption>
-                    )}
-                  </View>
-                  <Pressable
-                    style={styles.addButton}
-                    accessibilityLabel={`Agregar ${MEAL_TYPE_LABELS[mealType]}`}
-                    accessibilityRole="button"
-                  >
-                    <Plus size={20} color={colors.primary} />
-                  </Pressable>
-                </View>
 
-                {meal && meal.foods.length > 0 && (
-                  <View style={[styles.foodList, { borderTopColor: colors.borderLight }]}>
-                    {meal.foods.map((food) => (
-                      <View key={food.id} style={styles.foodRow}>
-                        <BodySmall style={{ flex: 1, color: colors.foreground, fontWeight: '500' }}>
-                          {food.name}
-                        </BodySmall>
-                        <Caption style={{ color: colors.muted, fontWeight: '600' }}>{food.calories} kcal</Caption>
-                      </View>
-                    ))}
-                  </View>
-                )}
+                  {meal && meal.foods.length > 0 && (
+                    <View style={[styles.foodList, { borderTopColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)' }]}>
+                      {meal.foods.map((food) => (
+                        <View key={food.id} style={styles.foodRow}>
+                          <BodySmall style={{ flex: 1, color: colors.foreground, fontWeight: '600' }}>
+                            {food.name}
+                          </BodySmall>
+                          <Caption style={{ color: colors.muted, fontWeight: '700' }}>{food.calories} kcal</Caption>
+                        </View>
+                      ))}
+                    </View>
+                  )}
 
-                {!meal && (
-                  <BodySmall style={{ marginTop: spacing.xs, color: colors.muted }}>
-                    Sin registro todavía
-                  </BodySmall>
-                )}
-              </GlassCard>
+                  {!meal && (
+                    <BodySmall style={{ marginTop: spacing.xs, color: colors.muted }}>
+                      Sin registro todavía
+                    </BodySmall>
+                  )}
+                </GlassCard>
+              </StaggerView>
             );
           })}
 
@@ -200,16 +226,21 @@ function MacroBar({
   return (
     <View style={styles.macroBarContainer}>
       <View style={styles.macroBarHeader}>
-        <Caption style={{ color: colors.muted }}>{label}</Caption>
-        <Caption style={{ color: colors.foreground, fontWeight: '700' }}>{Math.round(current)}/{target}g</Caption>
+        <Caption style={{ color: colors.muted, fontWeight: '600' }}>{label}</Caption>
+        <Caption style={{ color: colors.foreground, fontWeight: '800' }}>
+          {Math.round(current)}/{target}g
+        </Caption>
       </View>
-      <View style={[styles.macroBarTrack, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#E5E5EA' }]}>
+      <View style={[styles.macroBarTrack, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.10)' : '#E5E5EA' }]}>
         <View
           style={[
             styles.macroBarFill,
             { width: `${progress * 100}%`, backgroundColor: color },
           ]}
-        />
+        >
+          {/* 3D Specular Highlight en la barra de macro */}
+          <View style={styles.macroHighlight} />
+        </View>
       </View>
     </View>
   );
@@ -227,7 +258,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   largeTitle: {
-    fontSize: 32,
+    fontSize: 34,
     fontWeight: '800',
     letterSpacing: -0.8,
   },
@@ -237,6 +268,7 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     marginBottom: spacing.md,
+    paddingVertical: spacing.lg,
   },
   summaryRow: {
     flexDirection: 'row',
@@ -244,12 +276,13 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   calorieNumber: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '800',
+    letterSpacing: -0.5,
   },
   macrosSummary: {
     flex: 1,
-    gap: spacing.xs,
+    gap: spacing.xs + 2,
   },
   macroBarContainer: {
     gap: 4,
@@ -259,13 +292,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   macroBarTrack: {
-    height: 6,
+    height: 9,
     borderRadius: radius.full,
     overflow: 'hidden',
   },
   macroBarFill: {
     height: '100%',
     borderRadius: radius.full,
+    position: 'relative',
+  },
+  macroHighlight: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '40%',
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+    borderTopLeftRadius: radius.full,
+    borderTopRightRadius: radius.full,
   },
   cameraCard: {
     marginBottom: spacing.lg,
@@ -276,9 +320,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cameraIconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    width: 46,
+    height: 46,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
@@ -303,33 +347,34 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   cameraActionBadge: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: spacing.xs,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 4,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '800',
     marginBottom: spacing.sm,
-    letterSpacing: -0.3,
+    letterSpacing: -0.4,
   },
   mealCard: {
-    marginBottom: spacing.sm,
+    marginBottom: spacing.sm + 2,
   },
   mealHeader: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   mealIconContainer: {
-    width: 36,
-    height: 36,
+    width: 38,
+    height: 38,
     borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
@@ -356,3 +401,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+

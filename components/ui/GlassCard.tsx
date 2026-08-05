@@ -64,51 +64,63 @@ export function GlassCard({
   };
 
   const bgMapDark = {
-    hero: '#14141A',
-    medium: '#14141A',
-    subtle: 'rgba(255, 255, 255, 0.03)',
+    hero: 'rgba(20, 20, 28, 0.72)',
+    medium: 'rgba(20, 20, 28, 0.62)',
+    subtle: 'rgba(255, 255, 255, 0.05)',
   };
 
   const bgMapLight = {
-    hero: '#FFFFFF',
-    medium: '#FFFFFF',
-    subtle: 'rgba(0, 0, 0, 0.02)',
+    hero: 'rgba(255, 255, 255, 0.78)',
+    medium: 'rgba(255, 255, 255, 0.68)',
+    subtle: 'rgba(255, 255, 255, 0.50)',
   };
 
   const borderMapDark = {
-    hero: 'rgba(255, 255, 255, 0.14)',
-    medium: 'rgba(255, 255, 255, 0.10)',
-    subtle: 'rgba(255, 255, 255, 0.06)',
+    hero: 'rgba(255, 255, 255, 0.20)',
+    medium: 'rgba(255, 255, 255, 0.14)',
+    subtle: 'rgba(255, 255, 255, 0.08)',
   };
 
   const borderMapLight = {
-    hero: '#E5E5EA',
-    medium: '#E5E5EA',
-    subtle: '#E5E5EA',
+    hero: 'rgba(255, 255, 255, 0.90)',
+    medium: 'rgba(255, 255, 255, 0.75)',
+    subtle: 'rgba(255, 255, 255, 0.55)',
   };
 
   const glowStyle: ViewStyle = glowColor
     ? {
         shadowColor: glowColor,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: isDark ? 0.25 : 0.12,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: isDark ? 0.35 : 0.22,
+        shadowRadius: 14,
+        elevation: 6,
+      }
+    : isDark ? {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
         shadowRadius: 8,
         elevation: 4,
-      }
-    : isDark ? {} : {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.06,
-        shadowRadius: 6,
-        elevation: 2,
+      } : {
+        shadowColor: '#3B82F6',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.10,
+        shadowRadius: 10,
+        elevation: 3,
       };
 
   // Check if flex: 1 is in style
   const flattenedStyle = StyleSheet.flatten(style) || {};
   const outerFlexStyle: ViewStyle = flattenedStyle.flex !== undefined ? { flex: flattenedStyle.flex } : {};
 
+  const bevelHighlight: ViewStyle = {
+    borderTopColor: isDark ? 'rgba(255, 255, 255, 0.22)' : 'rgba(255, 255, 255, 0.95)',
+    borderLeftColor: isDark ? 'rgba(255, 255, 255, 0.16)' : 'rgba(255, 255, 255, 0.85)',
+  };
+
   const cardStyle = [
     styles.cardContent,
+    bevelHighlight,
     {
       backgroundColor: isDark ? bgMapDark[level] : bgMapLight[level],
       borderColor: isDark ? borderMapDark[level] : borderMapLight[level],
@@ -135,6 +147,7 @@ export function GlassCard({
   if (onPress) {
     return (
       <AnimatedPressable
+        renderToHardwareTextureAndroid={true}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         onPress={handlePress}
@@ -145,13 +158,21 @@ export function GlassCard({
     );
   }
 
-  return <View style={[styles.outerContainer, outerFlexStyle, glowStyle]}>{innerComponent}</View>;
+  return (
+    <View
+      renderToHardwareTextureAndroid={true}
+      style={[styles.outerContainer, outerFlexStyle, glowStyle]}
+    >
+      {innerComponent}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
   outerContainer: {
     borderRadius: radius.lg,
     marginVertical: spacing.xs,
+    overflow: 'hidden',
   },
   blurContainer: {
     borderRadius: radius.lg,
@@ -164,7 +185,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cardContent: {
-    borderWidth: 1,
+    borderWidth: 1.2,
     borderRadius: radius.lg,
     flex: 1,
   },

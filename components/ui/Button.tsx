@@ -99,7 +99,7 @@ function getButtonStyle(variant: ButtonVariant, size: ButtonSize, disabled: bool
   const base: ViewStyle = {
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: radius.md,
+    borderRadius: radius.xl || 24,
     minHeight: touchTargets.minimum,
     ...getSizeStyle(size),
   };
@@ -113,11 +113,40 @@ function getButtonStyle(variant: ButtonVariant, size: ButtonSize, disabled: bool
 
   switch (variant) {
     case 'primary':
-      return { ...base, backgroundColor: colors.primary };
+      return {
+        ...base,
+        backgroundColor: colors.primary,
+        borderTopWidth: 1.5,
+        borderLeftWidth: 1,
+        borderTopColor: 'rgba(255, 255, 255, 0.45)',
+        borderLeftColor: 'rgba(255, 255, 255, 0.25)',
+        borderBottomWidth: 2,
+        borderBottomColor: 'rgba(0, 0, 0, 0.2)',
+        shadowColor: colors.primary,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.38,
+        shadowRadius: 12,
+        elevation: 6,
+      };
     case 'secondary':
-      return { ...base, backgroundColor: colors.surface };
+      return {
+        ...base,
+        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255, 255, 255, 0.9)',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.08,
+        shadowRadius: 6,
+        elevation: 2,
+      };
     case 'outline':
-      return { ...base, backgroundColor: 'transparent', borderWidth: 1.5, borderColor: colors.primary };
+      return {
+        ...base,
+        backgroundColor: 'rgba(255, 255, 255, 0.08)',
+        borderWidth: 1.5,
+        borderColor: colors.primary,
+      };
     case 'ghost':
       return { ...base, backgroundColor: 'transparent' };
   }

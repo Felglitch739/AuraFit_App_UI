@@ -30,7 +30,7 @@ export default function CardTestScreen() {
       </Text>
 
       {/* Variant: default */}
-      <Text style={styles.sectionLabel}>variant="default"</Text>
+      <Text style={styles.sectionLabel}>{'variant="default"'}</Text>
       <Card>
         <Text style={styles.cardTitle}>Card Default</Text>
         <Text style={styles.cardBody}>
@@ -40,7 +40,7 @@ export default function CardTestScreen() {
       </Card>
 
       {/* Variant: elevated */}
-      <Text style={styles.sectionLabel}>variant="elevated"</Text>
+      <Text style={styles.sectionLabel}>{'variant="elevated"'}</Text>
       <Card variant="elevated">
         <Text style={styles.cardTitle}>Card Elevated</Text>
         <Text style={styles.cardBody}>
@@ -50,7 +50,7 @@ export default function CardTestScreen() {
       </Card>
 
       {/* Variant: flat */}
-      <Text style={styles.sectionLabel}>variant="flat"</Text>
+      <Text style={styles.sectionLabel}>{'variant="flat"'}</Text>
       <Card variant="flat">
         <Text style={styles.cardTitle}>Card Flat</Text>
         <Text style={styles.cardBody}>

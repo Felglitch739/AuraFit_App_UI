@@ -55,15 +55,19 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
 
   const renderContent = () => (
     <View style={styles.tabContent} onLayout={handleLayout}>
-      {/* Sliding Active Indicator */}
+      {/* Sliding Active Indicator con Resplandor Orbital */}
       {tabWidth > 0 && (
         <Animated.View
           style={[
             styles.activeSubPill,
             {
-              backgroundColor: isDark ? 'rgba(10, 132, 255, 0.22)' : 'rgba(0, 122, 255, 0.12)',
-              borderColor: isDark ? 'rgba(10, 132, 255, 0.45)' : 'rgba(0, 122, 255, 0.28)',
-              shadowColor: colors.primary,
+              backgroundColor: isDark ? 'rgba(59, 130, 246, 0.25)' : 'rgba(59, 130, 246, 0.16)',
+              borderColor: isDark ? 'rgba(59, 130, 246, 0.65)' : 'rgba(59, 130, 246, 0.45)',
+              shadowColor: '#3B82F6',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.45,
+              shadowRadius: 10,
+              elevation: 5,
             },
             animatedIndicatorStyle,
           ]}

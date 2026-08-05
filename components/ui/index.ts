@@ -20,4 +20,5 @@ export {
   BodySmall,
   Caption,
 } from './Typography';
-
+export { AnimatedCountUp } from './AnimatedCountUp';
+export { StaggerView } from './StaggerView';

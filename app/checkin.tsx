@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import Slider from '@react-native-community/slider';
-import { MeshBackground, GlassCard, TitleLarge, TitleSmall, LabelMedium, BodySmall, Caption, Button } from '@/components/ui';
+import { MeshBackground, GlassCard, TitleSmall, LabelMedium, Caption, Button, StaggerView } from '@/components/ui';
 import { spacing, radius } from '@/constants/theme';
 import { useUserStore } from '@/store/useUserStore';
 import type { MoodType } from '@/types';
@@ -46,205 +46,204 @@ export default function CheckinModal() {
     <MeshBackground>
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         {/* Header */}
-        <View style={styles.header}>
-          <View style={{ width: 36 }} />
-          <TitleSmall style={[styles.headerTitle, { color: colors.foreground }]}>Check-in de Bienestar</TitleSmall>
-          <Pressable
-            onPress={() => router.back()}
-            style={[styles.closeButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#E5E5EA' }]}
-            accessibilityLabel="Cerrar modal"
-          >
-            <X size={18} color={colors.foreground} />
-          </Pressable>
-        </View>
+        <StaggerView index={0}>
+          <View style={styles.header}>
+            <View style={{ width: 36 }} />
+            <TitleSmall style={[styles.headerTitle, { color: colors.foreground }]}>Check-in de Bienestar</TitleSmall>
+            <Pressable
+              onPress={() => router.back()}
+              style={[styles.closeButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.06)' }]}
+              accessibilityLabel="Cerrar modal"
+            >
+              <X size={18} color={colors.foreground} />
+            </Pressable>
+          </View>
+        </StaggerView>
 
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           {/* 1. ENERGÍA */}
-          <GlassCard level="hero" style={styles.card}>
-            <View style={styles.metricHeaderRow}>
-              <View style={[styles.iconBadge, { backgroundColor: isDark ? 'rgba(255, 159, 10, 0.16)' : 'rgba(255, 149, 0, 0.12)' }]}>
-                <Lightning size={22} color={colors.orange} weight="fill" />
+          <StaggerView index={1}>
+            <GlassCard level="hero" glowColor="#F97316" style={styles.card}>
+              <View style={styles.metricHeaderRow}>
+                <View style={[styles.clayBadge, { backgroundColor: '#F97316' }]}>
+                  <Lightning size={24} color="#FFFFFF" weight="fill" />
+                </View>
+                <View style={styles.metricTextCol}>
+                  <LabelMedium style={[styles.metricTitle, { color: colors.foreground }]}>Nivel de Energía</LabelMedium>
+                  <Caption style={{ color: colors.muted }}>¿Qué tan enérgico te sientes hoy?</Caption>
+                </View>
+                <View style={[styles.valuePill, { backgroundColor: 'rgba(249, 115, 22, 0.18)' }]}>
+                  <Text style={[styles.valuePillText, { color: '#F97316' }]}>{energy}/5</Text>
+                </View>
               </View>
-              <View style={styles.metricTextCol}>
-                <LabelMedium style={[styles.metricTitle, { color: colors.foreground }]}>Nivel de Energía</LabelMedium>
-                <Caption style={{ color: colors.muted }}>¿Qué tan enérgico te sientes hoy?</Caption>
-              </View>
-              <View style={[styles.valuePill, { backgroundColor: isDark ? 'rgba(255, 159, 10, 0.18)' : 'rgba(255, 149, 0, 0.12)' }]}>
-                <Text style={[styles.valuePillText, { color: colors.orange }]}>{energy}/5</Text>
-              </View>
-            </View>
 
-            {/* Custom Step Selector Buttons for Energy */}
-            <View style={styles.stepRow}>
-              {[1, 2, 3, 4, 5].map((val) => {
-                const isSelected = energy === val;
-                return (
-                  <Pressable
-                    key={val}
-                    onPress={() => {
-                      setEnergy(val);
-                      if (Platform.OS !== 'web') {
-                        try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch (_) {}
-                      }
-                    }}
-                    style={[
-                      styles.stepItem,
-                      {
-                        backgroundColor: isSelected
-                          ? colors.orange
-                          : isDark ? 'rgba(255, 255, 255, 0.05)' : '#F2F2F7',
-                        borderColor: isSelected
-                          ? colors.orange
-                          : colors.borderLight,
-                      },
-                    ]}
-                  >
-                    <Text
+              {/* Custom Step Selector Buttons for Energy */}
+              <View style={styles.stepRow}>
+                {[1, 2, 3, 4, 5].map((val) => {
+                  const isSelected = energy === val;
+                  return (
+                    <Pressable
+                      key={val}
+                      onPress={() => {
+                        setEnergy(val);
+                        if (Platform.OS !== 'web') {
+                          try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch (_) {}
+                        }
+                      }}
                       style={[
-                        styles.stepText,
-                        { color: isSelected ? '#FFFFFF' : colors.foreground },
+                        styles.stepItem,
+                        isSelected ? styles.stepItemSelectedOrange : styles.stepItemDefault,
+                        { borderColor: isSelected ? '#F97316' : (isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0,0,0,0.08)') },
                       ]}
                     >
-                      {val}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          </GlassCard>
+                      <Text
+                        style={[
+                          styles.stepText,
+                          { color: isSelected ? '#FFFFFF' : colors.foreground },
+                        ]}
+                      >
+                        {val}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </GlassCard>
+          </StaggerView>
 
           {/* 2. SUEÑO */}
-          <GlassCard level="hero" style={styles.card}>
-            <View style={styles.metricHeaderRow}>
-              <View style={[styles.iconBadge, { backgroundColor: isDark ? 'rgba(94, 92, 230, 0.16)' : 'rgba(88, 86, 214, 0.12)' }]}>
-                <Moon size={22} color={colors.purple} weight="fill" />
+          <StaggerView index={2}>
+            <GlassCard level="hero" glowColor="#A855F7" style={styles.card}>
+              <View style={styles.metricHeaderRow}>
+                <View style={[styles.clayBadge, { backgroundColor: '#A855F7' }]}>
+                  <Moon size={24} color="#FFFFFF" weight="fill" />
+                </View>
+                <View style={styles.metricTextCol}>
+                  <LabelMedium style={[styles.metricTitle, { color: colors.foreground }]}>Horas de Sueño</LabelMedium>
+                  <Caption style={{ color: colors.muted }}>¿Cuántas horas descansaste anoche?</Caption>
+                </View>
+                <View style={[styles.valuePill, { backgroundColor: 'rgba(168, 85, 247, 0.18)' }]}>
+                  <Text style={[styles.valuePillText, { color: '#A855F7' }]}>{sleep}h</Text>
+                </View>
               </View>
-              <View style={styles.metricTextCol}>
-                <LabelMedium style={[styles.metricTitle, { color: colors.foreground }]}>Horas de Sueño</LabelMedium>
-                <Caption style={{ color: colors.muted }}>¿Cuántas horas descansaste anoche?</Caption>
-              </View>
-              <View style={[styles.valuePill, { backgroundColor: isDark ? 'rgba(94, 92, 230, 0.18)' : 'rgba(88, 86, 214, 0.12)' }]}>
-                <Text style={[styles.valuePillText, { color: colors.purple }]}>{sleep}h</Text>
-              </View>
-            </View>
 
-            <View style={styles.sliderContainer}>
-              <Slider
-                style={styles.slider}
-                minimumValue={3}
-                maximumValue={12}
-                step={0.5}
-                value={sleep}
-                onValueChange={(val) => {
-                  setSleep(val);
-                }}
-                minimumTrackTintColor={colors.purple}
-                maximumTrackTintColor={isDark ? 'rgba(255,255,255,0.12)' : '#E5E5EA'}
-                thumbTintColor={colors.purple}
-              />
-              <View style={styles.sliderLabelsRow}>
-                <Caption style={{ color: colors.muted }}>3h</Caption>
-                <Caption style={{ color: colors.muted }}>7.5h (Ideal)</Caption>
-                <Caption style={{ color: colors.muted }}>12h</Caption>
+              <View style={styles.sliderContainer}>
+                <Slider
+                  style={styles.slider}
+                  minimumValue={3}
+                  maximumValue={12}
+                  step={0.5}
+                  value={sleep}
+                  onValueChange={(val) => {
+                    setSleep(val);
+                  }}
+                  minimumTrackTintColor="#A855F7"
+                  maximumTrackTintColor={isDark ? 'rgba(255,255,255,0.12)' : '#E5E5EA'}
+                  thumbTintColor="#A855F7"
+                />
+                <View style={styles.sliderLabelsRow}>
+                  <Caption style={{ color: colors.muted }}>3h</Caption>
+                  <Caption style={{ color: colors.muted, fontWeight: '700' }}>7.5h (Ideal)</Caption>
+                  <Caption style={{ color: colors.muted }}>12h</Caption>
+                </View>
               </View>
-            </View>
-          </GlassCard>
+            </GlassCard>
+          </StaggerView>
 
           {/* 3. ESTRÉS */}
-          <GlassCard level="hero" style={styles.card}>
-            <View style={styles.metricHeaderRow}>
-              <View style={[styles.iconBadge, { backgroundColor: isDark ? 'rgba(10, 132, 255, 0.16)' : 'rgba(0, 122, 255, 0.12)' }]}>
-                <Brain size={22} color={colors.primary} weight="fill" />
+          <StaggerView index={3}>
+            <GlassCard level="hero" glowColor="#3B82F6" style={styles.card}>
+              <View style={styles.metricHeaderRow}>
+                <View style={[styles.clayBadge, { backgroundColor: '#3B82F6' }]}>
+                  <Brain size={24} color="#FFFFFF" weight="fill" />
+                </View>
+                <View style={styles.metricTextCol}>
+                  <LabelMedium style={[styles.metricTitle, { color: colors.foreground }]}>Nivel de Estrés</LabelMedium>
+                  <Caption style={{ color: colors.muted }}>1 es muy relajado, 5 es estrés alto</Caption>
+                </View>
+                <View style={[styles.valuePill, { backgroundColor: 'rgba(59, 130, 246, 0.18)' }]}>
+                  <Text style={[styles.valuePillText, { color: '#3B82F6' }]}>{stress}/5</Text>
+                </View>
               </View>
-              <View style={styles.metricTextCol}>
-                <LabelMedium style={[styles.metricTitle, { color: colors.foreground }]}>Nivel de Estrés</LabelMedium>
-                <Caption style={{ color: colors.muted }}>1 es muy relajado, 5 es estrés alto</Caption>
-              </View>
-              <View style={[styles.valuePill, { backgroundColor: isDark ? 'rgba(10, 132, 255, 0.18)' : 'rgba(0, 122, 255, 0.12)' }]}>
-                <Text style={[styles.valuePillText, { color: colors.primary }]}>{stress}/5</Text>
-              </View>
-            </View>
 
-            <View style={styles.stepRow}>
-              {[1, 2, 3, 4, 5].map((val) => {
-                const isSelected = stress === val;
-                return (
-                  <Pressable
-                    key={val}
-                    onPress={() => {
-                      setStress(val);
-                      if (Platform.OS !== 'web') {
-                        try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch (_) {}
-                      }
-                    }}
-                    style={[
-                      styles.stepItem,
-                      {
-                        backgroundColor: isSelected
-                          ? colors.primary
-                          : isDark ? 'rgba(255, 255, 255, 0.05)' : '#F2F2F7',
-                        borderColor: isSelected
-                          ? colors.primary
-                          : colors.borderLight,
-                      },
-                    ]}
-                  >
-                    <Text
+              <View style={styles.stepRow}>
+                {[1, 2, 3, 4, 5].map((val) => {
+                  const isSelected = stress === val;
+                  return (
+                    <Pressable
+                      key={val}
+                      onPress={() => {
+                        setStress(val);
+                        if (Platform.OS !== 'web') {
+                          try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch (_) {}
+                        }
+                      }}
                       style={[
-                        styles.stepText,
-                        { color: isSelected ? '#FFFFFF' : colors.foreground },
+                        styles.stepItem,
+                        isSelected ? styles.stepItemSelectedBlue : styles.stepItemDefault,
+                        { borderColor: isSelected ? '#3B82F6' : (isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0,0,0,0.08)') },
                       ]}
                     >
-                      {val}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          </GlassCard>
+                      <Text
+                        style={[
+                          styles.stepText,
+                          { color: isSelected ? '#FFFFFF' : colors.foreground },
+                        ]}
+                      >
+                        {val}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </GlassCard>
+          </StaggerView>
 
           {/* 4. ÁNIMO / ESTADO DE ÁNIMO */}
-          <GlassCard level="hero" style={styles.card}>
-            <LabelMedium style={[styles.metricTitle, { color: colors.foreground, marginBottom: 4 }]}>
-              ¿Cómo está tu ánimo hoy?
-            </LabelMedium>
-            <Caption style={{ color: colors.muted, marginBottom: spacing.md }}>
-              Selecciona el estado que mejor describe tu día
-            </Caption>
+          <StaggerView index={4}>
+            <GlassCard level="hero" glowColor="#3B82F6" style={styles.card}>
+              <LabelMedium style={[styles.metricTitle, { color: colors.foreground, marginBottom: 4 }]}>
+                ¿Cómo está tu ánimo hoy?
+              </LabelMedium>
+              <Caption style={{ color: colors.muted, marginBottom: spacing.md }}>
+                Selecciona el estado que mejor describe tu día
+              </Caption>
 
-            <View style={styles.moodGridRow}>
-              {MOOD_OPTIONS.map((item) => {
-                const isSelected = mood === item.type;
-                const IconComponent = item.icon;
-                const iconColor = isSelected ? (colors as any)[item.colorKey] || colors.primary : colors.muted;
+              <View style={styles.moodGridRow}>
+                {MOOD_OPTIONS.map((item) => {
+                  const isSelected = mood === item.type;
+                  const iconColor = isSelected ? (colors as any)[item.colorKey] || '#3B82F6' : colors.muted;
 
-                return (
-                  <MoodCardTile
-                    key={item.type}
-                    item={item}
-                    isSelected={isSelected}
-                    iconColor={iconColor}
-                    colors={colors}
-                    isDark={isDark}
-                    onSelect={() => {
-                      setMood(item.type);
-                      if (Platform.OS !== 'web') {
-                        try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); } catch (_) {}
-                      }
-                    }}
-                  />
-                );
-              })}
-            </View>
-          </GlassCard>
+                  return (
+                    <MoodCardTile
+                      key={item.type}
+                      item={item}
+                      isSelected={isSelected}
+                      iconColor={iconColor}
+                      colors={colors}
+                      isDark={isDark}
+                      onSelect={() => {
+                        setMood(item.type);
+                        if (Platform.OS !== 'web') {
+                          try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); } catch (_) {}
+                        }
+                      }}
+                    />
+                  );
+                })}
+              </View>
+            </GlassCard>
+          </StaggerView>
 
-          <Button
-            title="Guardar Check-in de Hoy"
-            onPress={handleSave}
-            variant="primary"
-            size="lg"
-            style={styles.saveButton}
-          />
+          <StaggerView index={5}>
+            <Button
+              title="Guardar Check-in de Hoy"
+              onPress={handleSave}
+              variant="primary"
+              size="lg"
+              style={styles.saveButton}
+            />
+          </StaggerView>
 
           <View style={{ height: 30 }} />
         </ScrollView>
@@ -292,22 +291,22 @@ function MoodCardTile({
         styles.moodTile,
         {
           backgroundColor: isSelected
-            ? isDark ? 'rgba(10, 132, 255, 0.16)' : 'rgba(0, 122, 255, 0.10)'
+            ? isDark ? 'rgba(59, 130, 246, 0.22)' : 'rgba(59, 130, 246, 0.14)'
             : isDark ? 'rgba(255, 255, 255, 0.04)' : '#F2F2F7',
           borderColor: isSelected
-            ? colors.primary
+            ? '#3B82F6'
             : colors.borderLight,
         },
         animatedStyle,
       ]}
     >
-      <IconComponent size={28} color={iconColor} weight={isSelected ? 'fill' : 'regular'} />
+      <IconComponent size={30} color={iconColor} weight={isSelected ? 'fill' : 'regular'} />
       <Caption
         style={[
           styles.moodLabel,
           {
             color: isSelected ? colors.foreground : colors.muted,
-            fontWeight: isSelected ? '700' : '500',
+            fontWeight: isSelected ? '800' : '500',
           },
         ]}
         numberOfLines={1}
@@ -330,7 +329,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm + 2,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: '800',
   },
   closeButton: {
@@ -345,26 +344,35 @@ const styles = StyleSheet.create({
   },
   card: {
     marginBottom: spacing.md,
-    padding: spacing.md,
+    padding: spacing.md + 2,
   },
   metricHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: spacing.md,
   },
-  iconBadge: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+  clayBadge: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
+    borderTopWidth: 1.5,
+    borderLeftWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.5)',
+    borderLeftColor: 'rgba(255, 255, 255, 0.3)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 5,
   },
   metricTextCol: {
     flex: 1,
   },
   metricTitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '800',
   },
   valuePill: {
@@ -383,11 +391,30 @@ const styles = StyleSheet.create({
   },
   stepItem: {
     flex: 1,
-    height: 44,
+    height: 46,
     borderRadius: radius.md,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  stepItemDefault: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  stepItemSelectedOrange: {
+    backgroundColor: '#F97316',
+    shadowColor: '#F97316',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  stepItemSelectedBlue: {
+    backgroundColor: '#3B82F6',
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 4,
   },
   stepText: {
     fontSize: 16,
@@ -415,10 +442,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: spacing.sm + 4,
+    paddingVertical: spacing.sm + 6,
     paddingHorizontal: 2,
-    borderRadius: 14,
-    borderWidth: 1,
+    borderRadius: 16,
+    borderWidth: 1.2,
     gap: 6,
   },
   moodLabel: {
@@ -427,9 +454,6 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     marginTop: spacing.sm,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 4,
   },
 });
+
